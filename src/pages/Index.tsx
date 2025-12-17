@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { HUDCard, GlowingDivider } from '@/components/auth/HUDFrame';
 import { CyberBackground } from '@/components/auth/CyberBackground';
@@ -9,12 +10,31 @@ import { Loader2, LogOut, User, Zap, Target, TrendingUp } from 'lucide-react';
 export default function Index() {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from('onboarding_surveys')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+      
+      setHasCompletedOnboarding(!!data);
+    };
+
+    if (user) {
+      checkOnboarding();
+    }
+  }, [user]);
 
   if (loading) {
     return (
@@ -120,13 +140,19 @@ export default function Index() {
           </HUDCard>
 
           <HUDCard className="p-6 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <h3 className="font-display text-lg font-semibold mb-2">ONBOARDING SURVEY</h3>
+            <h3 className="font-display text-lg font-semibold mb-2">HUNTER REGISTRATION</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Complete your profile survey to unlock personalized recommendations and daily tasks.
+              {hasCompletedOnboarding 
+                ? 'Your calibration is complete. You can update it anytime.'
+                : 'Complete your profile survey to unlock personalized recommendations.'}
             </p>
-            <Button variant="cyber" className="w-full" disabled>
+            <Button 
+              variant={hasCompletedOnboarding ? 'cyber-ghost' : 'cyber-fill'}
+              className="w-full" 
+              onClick={() => navigate('/onboarding')}
+            >
               <Target className="w-4 h-4" />
-              Coming Soon
+              {hasCompletedOnboarding ? 'Update Survey' : 'Begin Calibration'}
             </Button>
           </HUDCard>
         </div>
