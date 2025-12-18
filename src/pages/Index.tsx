@@ -133,9 +133,13 @@ export default function Index() {
             <p className="text-sm text-muted-foreground mb-4">
               Upload your photo for AI-powered facial analysis and personalized recommendations.
             </p>
-            <Button variant="cyber" className="w-full" disabled>
+            <Button 
+              variant="cyber-fill"
+              className="w-full" 
+              onClick={() => navigate('/face-scan')}
+            >
               <Zap className="w-4 h-4" />
-              Coming Soon
+              Start Scan
             </Button>
           </HUDCard>
 

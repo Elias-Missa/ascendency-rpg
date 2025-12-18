@@ -127,7 +127,6 @@ export default function Report() {
         product_recommendation: rec.product_recommendation,
         impact_score: rec.impact_score,
         effort_score: rec.effort_score,
-        roi_score: rec.impact_score / rec.effort_score,
       }));
 
       const { data, error } = await supabase
