@@ -13,9 +13,12 @@ serve(async (req) => {
   }
 
   try {
-    const { imageUrl, faceScanId, userId, surveyData } = await req.json();
+    const { imageUrls, imageUrl, faceScanId, userId, surveyData } = await req.json();
     
-    console.log('Analyzing face scan:', faceScanId);
+    // Support both single image (legacy) and multi-image formats
+    const images = imageUrls || { front: imageUrl };
+    
+    console.log('Analyzing face scan:', faceScanId, 'with images:', Object.keys(images));
 
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!lovableApiKey) {
@@ -36,15 +39,26 @@ User Profile:
 - Supplements: ${surveyData.habits?.supplements || 'None listed'}
 ` : '';
 
-    const systemPrompt = `You are an expert facial aesthetics analyst for a "looksmaxing" app. Analyze the provided face image and generate personalized recommendations.
+    const systemPrompt = `You are an expert facial aesthetics analyst for a "looksmaxing" app. You will analyze multiple face images (front view, smile, and side profile) to generate comprehensive personalized recommendations.
 
 ${surveyContext}
 
 Your task:
-1. Analyze the facial features in the image
-2. Identify areas for improvement (skin, jawline, teeth, eyes, hair, etc.)
+1. Analyze all provided facial images from different angles
+2. Identify areas for improvement (skin, jawline, teeth, eyes, hair, facial symmetry, etc.)
 3. Generate a "Face Potential Score" from 1-100 based on current state and potential for improvement
-4. Create 5-8 specific, actionable recommendations
+4. Create 6-10 specific, actionable recommendations prioritized by ROI (impact vs effort)
+
+Key areas to analyze:
+- Face fat & bloating
+- Eyebrow shape & grooming
+- Skin quality (acne, texture, tone)
+- Hair style & quality
+- Teeth appearance (from smile photo)
+- Jawline definition (from side profile)
+- Eye area (bags, sclera color)
+- Facial symmetry
+- Overall facial harmony
 
 For each recommendation, provide:
 - category: One of "Skin", "Jaw", "Teeth", "Eyes", "Hair", "Face", "Lifestyle"
@@ -71,6 +85,22 @@ Respond ONLY with valid JSON in this exact format:
 
     console.log('Calling Lovable AI for analysis...');
 
+    // Build content array with all available images
+    const imageContent = [];
+    if (images.front) {
+      imageContent.push({ type: 'text', text: 'Front face (neutral expression):' });
+      imageContent.push({ type: 'image_url', image_url: { url: images.front } });
+    }
+    if (images.smile) {
+      imageContent.push({ type: 'text', text: 'Smile (showing teeth):' });
+      imageContent.push({ type: 'image_url', image_url: { url: images.smile } });
+    }
+    if (images.side) {
+      imageContent.push({ type: 'text', text: 'Side profile:' });
+      imageContent.push({ type: 'image_url', image_url: { url: images.side } });
+    }
+    imageContent.push({ type: 'text', text: 'Analyze these images and provide comprehensive recommendations:' });
+
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -81,13 +111,7 @@ Respond ONLY with valid JSON in this exact format:
         model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: systemPrompt },
-          { 
-            role: 'user', 
-            content: [
-              { type: 'text', text: 'Analyze this face image and provide recommendations:' },
-              { type: 'image_url', image_url: { url: imageUrl } }
-            ]
-          }
+          { role: 'user', content: imageContent }
         ],
       }),
     });
