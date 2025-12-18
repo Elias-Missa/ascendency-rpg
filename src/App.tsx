@@ -12,6 +12,10 @@ import Report from "./pages/Report";
 import FaceScan from "./pages/FaceScan";
 import Tasks from "./pages/Tasks";
 import Guide from "./pages/Guide";
+import GuideFace from "./pages/guide/GuideFace";
+import GuideHygiene from "./pages/guide/GuideHygiene";
+import GuideStyle from "./pages/guide/GuideStyle";
+import GuideBody from "./pages/guide/GuideBody";
 import Progress from "./pages/Progress";
 import Profile from "./pages/Profile";
 import Schedule from "./pages/Schedule";
@@ -37,6 +41,10 @@ const App = () => (
               <Route path="/face-scan" element={<FaceScan />} />
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/guide" element={<Guide />} />
+              <Route path="/guide/face" element={<GuideFace />} />
+              <Route path="/guide/hygiene" element={<GuideHygiene />} />
+              <Route path="/guide/style" element={<GuideStyle />} />
+              <Route path="/guide/body" element={<GuideBody />} />
               <Route path="/progress" element={<Progress />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/schedule" element={<Schedule />} />
