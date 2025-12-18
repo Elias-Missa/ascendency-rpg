@@ -1,40 +1,26 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { CyberBackground } from '@/components/auth/CyberBackground';
 import { Loader2 } from 'lucide-react';
 import guideCharacter from '@/assets/guide-character.png';
 
-interface HotspotProps {
-  label: string;
+interface ClickZoneProps {
   path: string;
   className: string;
+  ariaLabel: string;
 }
 
-function Hotspot({ label, path, className }: HotspotProps) {
+function ClickZone({ path, className, ariaLabel }: ClickZoneProps) {
   const navigate = useNavigate();
   
   return (
     <button
       onClick={() => navigate(path)}
-      className={`absolute group cursor-pointer transition-all duration-300 ${className}`}
+      aria-label={ariaLabel}
+      className={`absolute cursor-pointer transition-all duration-300 hover:scale-110 ${className}`}
     >
-      {/* Glowing highlight area */}
-      <div className="absolute inset-0 rounded-full bg-primary/20 group-hover:bg-primary/40 transition-all duration-300 animate-pulse-glow" />
-      
-      {/* Label */}
-      <div className="relative z-10 px-4 py-2 bg-background/80 backdrop-blur-sm border border-primary/50 rounded-lg 
-                      group-hover:border-primary group-hover:bg-primary/20 group-hover:scale-110 
-                      transition-all duration-300 shadow-lg shadow-primary/20">
-        <span className="font-display font-bold text-sm text-primary group-hover:text-primary-foreground 
-                        tracking-wider uppercase glow-text">
-          {label}
-        </span>
-      </div>
-      
-      {/* Animated ring effect on hover */}
-      <div className="absolute inset-0 rounded-full border-2 border-primary/0 group-hover:border-primary/60 
-                      group-hover:scale-150 transition-all duration-500 opacity-0 group-hover:opacity-100" />
+      {/* Invisible clickable area with hover glow effect */}
+      <div className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300 bg-primary/20 blur-xl" />
     </button>
   );
 }
@@ -60,61 +46,46 @@ export default function Guide() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen pb-24 relative overflow-hidden">
-      <CyberBackground />
-
-      <main className="relative z-10 container mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="mb-4 text-center">
-          <h1 className="text-2xl font-display font-bold mb-1 glow-text">KNOWLEDGE BASE</h1>
-          <p className="text-sm font-mono text-muted-foreground">
-            Select an area to explore
-          </p>
-        </div>
-
-        {/* Interactive Character */}
-        <div className="relative mx-auto max-w-md aspect-square flex items-center justify-center">
-          {/* Character Image */}
+    <div className="min-h-screen pb-24 relative overflow-hidden bg-background">
+      {/* The image includes its own background */}
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
+        {/* Interactive Character Image */}
+        <div className="relative w-full max-w-md aspect-square">
           <img 
             src={guideCharacter} 
-            alt="Guide Character" 
-            className="w-full h-full object-contain relative z-0 drop-shadow-[0_0_30px_hsl(var(--primary)/0.3)]"
+            alt="Ascension Guide Character" 
+            className="w-full h-full object-contain"
           />
           
-          {/* Hotspots positioned over the character */}
-          {/* Face Hotspot */}
-          <Hotspot 
-            label="Face" 
+          {/* Click zones positioned over the labeled areas in the image */}
+          {/* Face - over the glowing face area */}
+          <ClickZone 
             path="/guide/face" 
-            className="top-[8%] left-1/2 -translate-x-1/2"
+            ariaLabel="Face Guide"
+            className="top-[25%] left-1/2 -translate-x-1/2 w-24 h-16"
           />
           
-          {/* Left Hand - Hygiene (character's right, viewer's left) */}
-          <Hotspot 
-            label="Hygiene" 
+          {/* Hygiene - over the left orb */}
+          <ClickZone 
             path="/guide/hygiene" 
-            className="top-[42%] left-[5%]"
+            ariaLabel="Hygiene Guide"
+            className="top-[45%] left-[12%] w-20 h-20"
           />
           
-          {/* Right Hand - Style (character's left, viewer's right) */}
-          <Hotspot 
-            label="Style" 
+          {/* Style - over the right orb */}
+          <ClickZone 
             path="/guide/style" 
-            className="top-[42%] right-[5%]"
+            ariaLabel="Style Guide"
+            className="top-[45%] right-[12%] w-20 h-20"
           />
           
-          {/* Body Hotspot */}
-          <Hotspot 
-            label="Body" 
+          {/* Body - over the body text area */}
+          <ClickZone 
             path="/guide/body" 
-            className="top-[55%] left-1/2 -translate-x-1/2"
+            ariaLabel="Body Guide"
+            className="top-[52%] left-1/2 -translate-x-1/2 w-20 h-12"
           />
         </div>
-
-        {/* Instruction text */}
-        <p className="text-center text-xs font-mono text-muted-foreground mt-4 animate-pulse">
-          TAP A GLOWING AREA TO LEARN MORE
-        </p>
       </main>
     </div>
   );
