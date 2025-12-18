@@ -12,6 +12,7 @@ for each issue we can reccomend multiple things actions, products, daily habits
 
 App Layout: 
 -Report Tab: They need to have their report section, with their full looksmax report, with sections within this report ex: hair etc. This report will also be sorted in priority and ROI, ex: easy things with huge differences
+-Guide Tab: All knowledge about looksmaxing we know. users can come here to learn and to explore, but its all general, if they want the specifics for them, then they go back to their report tab. 
 will be highest priority. 
 - Progess Tab: has the users original seflie, and will make the user take a selfie every month in the same spot and lighting for progess
 - Face Scan/survey Tab: If the user messed up their face scan or survey, they can come here take a new one and generate a new report (only 1 free)
