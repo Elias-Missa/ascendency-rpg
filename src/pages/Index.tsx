@@ -6,11 +6,19 @@ import { Button } from '@/components/ui/button';
 import { HUDCard, GlowingDivider } from '@/components/auth/HUDFrame';
 import { CyberBackground } from '@/components/auth/CyberBackground';
 import { Loader2, LogOut, User, Zap, Target, TrendingUp } from 'lucide-react';
+import { calculateLevel, getXpForCurrentLevel, XP_PER_LEVEL } from '@/lib/xp-utils';
+
+interface ProfileData {
+  current_xp: number;
+  face_potential_score: number | null;
+}
 
 export default function Index() {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [todayTaskCount, setTodayTaskCount] = useState(0);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -19,20 +27,42 @@ export default function Index() {
   }, [user, loading, navigate]);
 
   useEffect(() => {
-    const checkOnboarding = async () => {
+    const fetchData = async () => {
       if (!user) return;
       
-      const { data } = await supabase
+      // Check onboarding
+      const { data: onboardingData } = await supabase
         .from('onboarding_surveys')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
       
-      setHasCompletedOnboarding(!!data);
+      setHasCompletedOnboarding(!!onboardingData);
+
+      // Fetch profile
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('current_xp, face_potential_score')
+        .eq('id', user.id)
+        .single();
+
+      if (profileData) {
+        setProfile(profileData);
+      }
+
+      // Fetch today's tasks
+      const today = new Date().toISOString().split('T')[0];
+      const { data: tasksData } = await supabase
+        .from('daily_tasks')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('date_assigned', today);
+
+      setTodayTaskCount(tasksData?.length || 0);
     };
 
     if (user) {
-      checkOnboarding();
+      fetchData();
     }
   }, [user]);
 
@@ -49,13 +79,16 @@ export default function Index() {
 
   if (!user) return null;
 
+  const level = profile ? calculateLevel(profile.current_xp) : 1;
+  const xpInLevel = profile ? getXpForCurrentLevel(profile.current_xp) : 0;
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/auth');
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen pb-24 relative overflow-hidden">
       <CyberBackground />
       
       {/* Header */}
@@ -103,9 +136,9 @@ export default function Index() {
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {[
-            { icon: User, label: 'Current Level', value: '1', subtext: '0 / 100 XP' },
-            { icon: Target, label: 'Face Score', value: '--', subtext: 'Scan Required' },
-            { icon: TrendingUp, label: 'Tasks Today', value: '0', subtext: 'No tasks assigned' },
+            { icon: User, label: 'Current Level', value: level.toString(), subtext: `${xpInLevel} / ${XP_PER_LEVEL} XP` },
+            { icon: Target, label: 'Face Score', value: profile?.face_potential_score?.toString() || '--', subtext: profile?.face_potential_score ? 'Analysis Complete' : 'Scan Required' },
+            { icon: TrendingUp, label: 'Tasks Today', value: todayTaskCount.toString(), subtext: todayTaskCount > 0 ? 'Tasks assigned' : 'No tasks assigned' },
           ].map(({ icon: Icon, label, value, subtext }, i) => (
             <HUDCard 
               key={label} 
