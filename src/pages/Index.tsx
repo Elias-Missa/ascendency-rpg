@@ -127,7 +127,7 @@ export default function Index() {
         {/* Quick Actions */}
         <GlowingDivider className="mb-8" />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <HUDCard className="p-6 animate-fade-in" style={{ animationDelay: '0.5s' }}>
             <h3 className="font-display text-lg font-semibold mb-2">FACE ANALYSIS</h3>
             <p className="text-sm text-muted-foreground mb-4">
@@ -153,6 +153,21 @@ export default function Index() {
             >
               <Target className="w-4 h-4" />
               {hasCompletedOnboarding ? 'Update Survey' : 'Begin Calibration'}
+            </Button>
+          </HUDCard>
+
+          <HUDCard className="p-6 animate-fade-in" style={{ animationDelay: '0.7s' }}>
+            <h3 className="font-display text-lg font-semibold mb-2">VIEW REPORT</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Access your personalized looksmax report with prioritized quests and recommendations.
+            </p>
+            <Button 
+              variant="cyber-fill"
+              className="w-full" 
+              onClick={() => navigate('/report')}
+            >
+              <TrendingUp className="w-4 h-4" />
+              Open Report
             </Button>
           </HUDCard>
         </div>
