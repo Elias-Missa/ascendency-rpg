@@ -212,7 +212,7 @@ export default function Report() {
   }
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen pb-24 bg-background relative">
       <CyberBackground />
       
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
