@@ -1,0 +1,127 @@
+Project Name: Ascendency Core Concept: The world's first free "Looksmaxing" RPG. Vibe: "Solo Leveling" / Futuristic Anime (Dark mode, Neon Blue, System Interfaces).
+
+1. 📱 User Flow & Onboarding Logic
+Account Creation: Immediate requirement. Email/Password or Social Auth (Supabase Auth).
+
+The "Hunter" Survey:
+
+Inputs: Height, Age, Weight, Ethnicity, Lifestyle Habits (Smoking, Sleep, Water intake).
+
+Data use: Used to calibrate the recommendation engine (e.g., specific advice for specific ethnicities).
+
+The Face Scan (Biometric Ingestion):
+
+Input: Camera capture (Selfie).
+
+Security: Display BIPA/Privacy Consent Popup before camera opens.
+
+Processing: Image sent to backend (AI Vision model) to analyze features.
+
+2. 🧠 The "System" Logic (Backend Analysis)
+The Core Algorithm: The backend must process the Survey + Scan to generate a "Face Potential Score" (0-100) and a "Looksmaxing Plan."
+
+Target Features to Detect (The "Flaws"): The AI must explicitly look for and tag:
+
+Face Fat / Face Bloat
+
+Eyebrow Shape (Weak/Bad)
+
+Acne / Skin Texture
+
+Hair Style Suitability
+
+Skin Tone (Pale/Dullness)
+
+Teeth (Yellow/Crooked)
+
+Eye Bags / Dark Circles
+
+Sclera Color (Yellowish/Red)
+
+The "ROI" Sorting Engine: Recommendations must be sorted by Return on Investment.
+
+Logic: Priority Score = (Aesthetic Impact) / (Time & Effort Cost)
+
+Example: Whitening teeth strips (High Impact / Low Effort) = Rank 1.
+
+Example: Jaw surgery (High Impact / Extreme Effort) = Rank 10.
+
+3. 🖥️ Application Architecture (Tabs & UI)
+Tab 1: The Report (Home)
+
+Header: User's "Face Potential Score" and Current Level.
+
+Body: Scrollable list of "Quests" (Recommendations).
+
+Organization: Sorted by Priority/ROI (Immediate fixes first).
+
+Detail View: Clicking a specific issue (e.g., "Face Bloat") opens a drawer with:
+
+Action items (e.g., "Drink 4L Water", "Low Sodium").
+
+Product Recommendations (Affiliate placeholders).
+
+Daily Habits to add.
+
+Tab 2: Progress (The Gallery)
+
+Layout: "Before & After" slider comparison.
+
+Constraint: User must take a monthly selfie.
+
+UI Helper: When taking a new selfie, overlay the original selfie as a semi-transparent "ghost" guide to ensure same angle/lighting.
+
+Tab 3: Scan & Calibration
+
+Function: Allow user to retake Survey or Face Scan.
+
+Logic Gate: "One Free Redo." If the user messes up the first scan, they get 1 free retry. Subsequent retries are locked (Premium feature).
+
+Tab 4: Tasks / Calendar (The Quest Log)
+
+View A (Daily): Checklist of daily habits generated from the Report (e.g., "Mewing 30 mins", "Skincare Routine").
+
+View B (Calendar): Monthly view of adherence.
+
+Gamification: Completing tasks grants XP. XP levels up the user's Avatar.
+
+Tab 5: Profile (Hunter Info)
+
+Display: User Avatar, Level, Settings.
+
+Consultations: "Meeting Scheduler" button integration (WebView or API link to Calendly) for 1-on-1 coaching.
+
+4. 💰 Monetization Architecture
+Build the app with these placeholders ready:
+
+In-App Ads: Reserved slots in the Report feed for native banner ads.
+
+Premium Subscription: Boolean flag in database is_premium.
+
+Removes Ads.
+
+Unlocks "Advanced Advice" (e.g., Peptides, advanced dermatology).
+
+Unlocks unlimited Scans.
+
+Product Sponsorships: The "Product Recommendation" slots in the Report tab must be dynamic (editable via backend).
+
+Skins/Themes: Avatar customization options locked behind "Premium" or direct purchase.
+
+Consultations: Payment gateway integration for the $5 live consults.
+
+5. 🛡️ Priorities: Security & Legal
+Medical Disclaimer: Sticky footer on ALL Report screens: "Not Medical Advice. Consult a professional."
+
+Data Encryption: All images stored in Private Buckets (Supabase Storage).
+
+Vulnerability Protection: Inputs must be sanitized (prevent SQL injection).
+
+6. 🛠️ Tech Stack (Mandatory)
+Frontend: React Native (Expo) or Next.js PWA.
+
+Styling: Tailwind CSS (Solo Leveling Theme).
+
+Backend: Supabase (Auth, Database, Storage).
+
+AI: OpenAI GPT-4o Vision (via API Route).

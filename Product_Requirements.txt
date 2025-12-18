@@ -1,0 +1,31 @@
+Ascendency, the worlds first free Looksmaxing App. Become more attractive. 
+
+Users will open the app, and immedietly make an account
+
+They will then take a survey that asks a series of questions: height, age , weight, ethnicity, habits etc. will be extensive
+
+They will scan their face and our backend ML model will process it (either gpt wrapper or custom tuned model) 
+
+Using survey data and face scan data we will find their biggest fixable flaws and a 'face potential score' , and create a custom looksmaxing plan for them, invloving thingss they need to do immedietly, products we reccomend, habits to start daily,
+it will be a comprehensive report. Biggest Things to look for/target: Face Fat, Face Bloat, Weak/bad shaped Eyebrows, Acne,hair style, Pale Skin, yellow/crooked teeth, eyebags, yellowish sclera etc. 
+for each issue we can reccomend multiple things actions, products, daily habits
+
+App Layout: 
+-Report Tab: They need to have their report section, with their full looksmax report, with sections within this report ex: hair etc. This report will also be sorted in priority and ROI, ex: easy things with huge differences
+will be highest priority. 
+- Progess Tab: has the users original seflie, and will make the user take a selfie every month in the same spot and lighting for progess
+- Face Scan/survey Tab: If the user messed up their face scan or survey, they can come here take a new one and generate a new report (only 1 free)
+- Tasks / Calender Tab: maybe different tabs , one with a monthly calendar, and one with their daily tasks. completing tasks gives XP points to level up 
+-Profile Tab: Shows user settings, user avatar, level etc. 
+-Meeting Scheduler: allows user to schedule an online meeting/consultation
+
+App will be free at first, must gain a large userbase, after we can monetize in 5 different ways:
+1. In App Ads 
+2. Premium (more in depth adivce peptides etc. and removes all ads. 
+3. Product Sponsorships
+4. Skins and color themes for their avatar (can possibly merge with #2 in premium feature)
+5. 1 on 1 live consulations can start cheap 5$
+
+App Theme: Futuristic, anime style, similar to Solo Leveling. 
+Priorities: Legal , Security, CyberSecurity. 
+Want to build it by 'vibe coding' using a new tool called OpenBuilder. 
