@@ -6,7 +6,7 @@ import { CyberBackground } from '@/components/auth/CyberBackground';
 import { HUDCard } from '@/components/auth/HUDFrame';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, User, LogOut, Zap, Crown, Settings, Shield, FileText } from 'lucide-react';
+import { Loader2, User, LogOut, Zap, Crown, Settings, Shield, FileText, Camera } from 'lucide-react';
 import { calculateLevel, getXpForCurrentLevel, getXpProgress, XP_PER_LEVEL } from '@/lib/xp-utils';
 
 interface ProfileData {
@@ -140,6 +140,10 @@ export default function Profile() {
 
         {/* Actions */}
         <div className="space-y-3">
+          <Button variant="cyber" className="w-full justify-start" onClick={() => navigate('/progress')}>
+            <Camera className="w-4 h-4 mr-2" />
+            Progress Tracker
+          </Button>
           <Button variant="cyber" className="w-full justify-start" onClick={() => navigate('/onboarding')}>
             <Settings className="w-4 h-4 mr-2" />
             Update Survey Data

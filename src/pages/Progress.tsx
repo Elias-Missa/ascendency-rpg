@@ -6,9 +6,21 @@ import { CyberBackground } from '@/components/auth/CyberBackground';
 import { HUDCard, GlowingDivider } from '@/components/auth/HUDFrame';
 import { BeforeAfterSlider } from '@/components/progress/BeforeAfterSlider';
 import { ProgressPhotoCapture } from '@/components/progress/ProgressPhotoCapture';
-import { Loader2, Camera, Calendar, TrendingUp, ImageIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { 
+  Loader2, 
+  Camera, 
+  Calendar, 
+  TrendingUp, 
+  ImageIcon, 
+  ArrowLeft,
+  Clock
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { format, differenceInDays } from 'date-fns';
+import { cn } from '@/lib/utils';
+
+type ProgressFrequency = 'biweekly' | 'monthly';
 
 interface ProgressPhoto {
   id: string;
@@ -18,12 +30,21 @@ interface ProgressPhoto {
   signedUrl?: string;
 }
 
+interface FaceScan {
+  id: string;
+  image_path: string;
+  created_at: string;
+  images: { front?: string; smile?: string; side?: string } | null;
+}
+
 export default function Progress() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [photos, setPhotos] = useState<ProgressPhoto[]>([]);
+  const [initialPhoto, setInitialPhoto] = useState<{ url: string; date: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedCompare, setSelectedCompare] = useState<{ before: ProgressPhoto; after: ProgressPhoto } | null>(null);
+  const [frequency, setFrequency] = useState<ProgressFrequency>('monthly');
+  const [selectedCompare, setSelectedCompare] = useState<{ before: string; after: string; beforeDate: string; afterDate: string } | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -33,16 +54,41 @@ export default function Progress() {
 
   useEffect(() => {
     if (user) {
-      fetchProgressPhotos();
+      fetchData();
     }
   }, [user]);
 
-  const fetchProgressPhotos = async () => {
+  const fetchData = async () => {
     if (!user) return;
     
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Fetch the first face scan as initial baseline
+      const { data: scanData } = await supabase
+        .from('face_scans')
+        .select('id, image_path, created_at, images')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      if (scanData) {
+        // Get signed URL for the front image
+        const imagePath = (scanData.images as any)?.front || scanData.image_path;
+        const { data: urlData } = await supabase.storage
+          .from('face-scans')
+          .createSignedUrl(imagePath, 3600);
+        
+        if (urlData?.signedUrl) {
+          setInitialPhoto({
+            url: urlData.signedUrl,
+            date: scanData.created_at,
+          });
+        }
+      }
+
+      // Fetch progress photos
+      const { data: progressData, error } = await supabase
         .from('progress_photos')
         .select('*')
         .eq('user_id', user.id)
@@ -52,7 +98,7 @@ export default function Progress() {
 
       // Get signed URLs for all photos
       const photosWithUrls = await Promise.all(
-        (data || []).map(async (photo) => {
+        (progressData || []).map(async (photo) => {
           const { data: urlData } = await supabase.storage
             .from('face-scans')
             .createSignedUrl(photo.image_path, 3600);
@@ -62,19 +108,36 @@ export default function Progress() {
 
       setPhotos(photosWithUrls);
 
-      // Auto-select first and last for comparison if we have at least 2
-      if (photosWithUrls.length >= 2) {
+      // Set up comparison with initial photo as baseline
+      if (initialPhoto && photosWithUrls.length > 0 && photosWithUrls[0].signedUrl) {
         setSelectedCompare({
-          before: photosWithUrls[photosWithUrls.length - 1],
-          after: photosWithUrls[0],
+          before: initialPhoto.url,
+          after: photosWithUrls[0].signedUrl,
+          beforeDate: initialPhoto.date,
+          afterDate: photosWithUrls[0].photo_date,
         });
       }
     } catch (error) {
-      console.error('Error fetching progress photos:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Update comparison when initial photo loads
+  useEffect(() => {
+    if (initialPhoto && photos.length > 0 && photos[0].signedUrl) {
+      setSelectedCompare({
+        before: initialPhoto.url,
+        after: photos[0].signedUrl,
+        beforeDate: initialPhoto.date,
+        afterDate: photos[0].photo_date,
+      });
+    } else if (initialPhoto && photos.length === 0) {
+      // If no progress photos yet, just show the initial
+      setSelectedCompare(null);
+    }
+  }, [initialPhoto, photos]);
 
   const handlePhotoCapture = async (file: File) => {
     if (!user) return;
@@ -100,18 +163,24 @@ export default function Progress() {
       if (insertError) throw insertError;
 
       toast.success('Progress photo saved!');
-      fetchProgressPhotos();
+      fetchData();
     } catch (error) {
       console.error('Error saving progress photo:', error);
       toast.error('Failed to save photo');
     }
   };
 
+  const frequencyDays = frequency === 'biweekly' ? 14 : 30;
   const daysSinceLastPhoto = photos.length > 0 
     ? differenceInDays(new Date(), new Date(photos[0].photo_date))
-    : null;
+    : initialPhoto 
+      ? differenceInDays(new Date(), new Date(initialPhoto.date))
+      : null;
 
-  const shouldTakePhoto = daysSinceLastPhoto === null || daysSinceLastPhoto >= 30;
+  const shouldTakePhoto = daysSinceLastPhoto === null || daysSinceLastPhoto >= frequencyDays;
+  const daysUntilNext = daysSinceLastPhoto !== null 
+    ? Math.max(0, frequencyDays - daysSinceLastPhoto) 
+    : 0;
 
   if (loading) {
     return (
@@ -128,11 +197,17 @@ export default function Progress() {
       <CyberBackground />
 
       <main className="relative z-10 container mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-display font-bold mb-1">PROGRESS TRACKER</h1>
-          <p className="text-sm font-mono text-muted-foreground">
-            Track your transformation over time
-          </p>
+        {/* Header with back button */}
+        <div className="flex items-center gap-3 mb-6">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/profile')}>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-display font-bold">PROGRESS TRACKER</h1>
+            <p className="text-sm font-mono text-muted-foreground">
+              Track your transformation over time
+            </p>
+          </div>
         </div>
 
         {isLoading ? (
@@ -141,19 +216,47 @@ export default function Progress() {
           </div>
         ) : (
           <div className="space-y-6">
+            {/* Frequency Selector */}
+            <HUDCard className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Clock className="w-5 h-5 text-primary" />
+                <h2 className="font-semibold text-foreground">Photo Frequency</h2>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant={frequency === 'biweekly' ? 'cyber-fill' : 'outline'}
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setFrequency('biweekly')}
+                >
+                  Bi-weekly (14 days)
+                </Button>
+                <Button
+                  variant={frequency === 'monthly' ? 'cyber-fill' : 'outline'}
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setFrequency('monthly')}
+                >
+                  Monthly (30 days)
+                </Button>
+              </div>
+            </HUDCard>
+
             {/* Stats Row */}
             <div className="grid grid-cols-2 gap-4">
               <HUDCard className="p-4 text-center">
                 <ImageIcon className="w-6 h-6 text-primary mx-auto mb-2" />
-                <p className="text-2xl font-bold text-foreground">{photos.length}</p>
-                <p className="text-xs text-muted-foreground">Photos Taken</p>
+                <p className="text-2xl font-bold text-foreground">{photos.length + (initialPhoto ? 1 : 0)}</p>
+                <p className="text-xs text-muted-foreground">Total Photos</p>
               </HUDCard>
               <HUDCard className="p-4 text-center">
                 <Calendar className="w-6 h-6 text-primary mx-auto mb-2" />
                 <p className="text-2xl font-bold text-foreground">
-                  {daysSinceLastPhoto ?? '-'}
+                  {shouldTakePhoto ? 'Now!' : `${daysUntilNext}d`}
                 </p>
-                <p className="text-xs text-muted-foreground">Days Since Last</p>
+                <p className="text-xs text-muted-foreground">
+                  {shouldTakePhoto ? 'Photo Due' : 'Until Next'}
+                </p>
               </HUDCard>
             </div>
 
@@ -163,12 +266,12 @@ export default function Progress() {
                 <div className="flex items-center gap-2 mb-4">
                   <Camera className="w-5 h-5 text-primary" />
                   <h2 className="font-semibold text-foreground">
-                    {photos.length === 0 ? 'Take Your First Photo' : 'Monthly Check-In Due'}
+                    {photos.length === 0 ? 'Take Your First Progress Photo' : `${frequency === 'biweekly' ? 'Bi-weekly' : 'Monthly'} Check-In Due`}
                   </h2>
                 </div>
                 <ProgressPhotoCapture
                   onCapture={handlePhotoCapture}
-                  ghostImage={photos[0]?.signedUrl}
+                  ghostImage={photos[0]?.signedUrl || initialPhoto?.url}
                 />
                 <p className="text-xs text-muted-foreground mt-3 text-center">
                   Take a photo in the same spot & lighting as before
@@ -179,35 +282,59 @@ export default function Progress() {
             <GlowingDivider />
 
             {/* Before/After Comparison */}
-            {selectedCompare && selectedCompare.before.signedUrl && selectedCompare.after.signedUrl && (
+            {selectedCompare && (
               <HUDCard className="p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <TrendingUp className="w-5 h-5 text-primary" />
                   <h2 className="font-semibold text-foreground">Transformation</h2>
                 </div>
                 <BeforeAfterSlider
-                  beforeImage={selectedCompare.before.signedUrl}
-                  afterImage={selectedCompare.after.signedUrl}
-                  beforeLabel={format(new Date(selectedCompare.before.photo_date), 'MMM yyyy')}
-                  afterLabel={format(new Date(selectedCompare.after.photo_date), 'MMM yyyy')}
+                  beforeImage={selectedCompare.before}
+                  afterImage={selectedCompare.after}
+                  beforeLabel={format(new Date(selectedCompare.beforeDate), 'MMM yyyy')}
+                  afterLabel={format(new Date(selectedCompare.afterDate), 'MMM yyyy')}
                 />
+              </HUDCard>
+            )}
+
+            {/* Initial Photo (Baseline) */}
+            {initialPhoto && (
+              <HUDCard className="p-4">
+                <h2 className="font-semibold text-foreground mb-3">Baseline (First Scan)</h2>
+                <div className="aspect-[3/4] max-w-[200px] mx-auto rounded-lg overflow-hidden border border-primary/30">
+                  <img
+                    src={initialPhoto.url}
+                    alt="Initial scan"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground text-center mt-2 font-mono">
+                  {format(new Date(initialPhoto.date), 'MMMM d, yyyy')}
+                </p>
               </HUDCard>
             )}
 
             {/* Photo Timeline */}
             {photos.length > 0 && (
               <HUDCard className="p-4">
-                <h2 className="font-semibold text-foreground mb-4">Photo Timeline</h2>
+                <h2 className="font-semibold text-foreground mb-4">Progress Timeline</h2>
                 <div className="grid grid-cols-3 gap-2">
                   {photos.map((photo) => (
                     <div 
                       key={photo.id}
-                      className="aspect-[3/4] rounded-lg overflow-hidden border border-primary/20 relative group cursor-pointer"
+                      className={cn(
+                        "aspect-[3/4] rounded-lg overflow-hidden border relative group cursor-pointer transition-all",
+                        selectedCompare?.after === photo.signedUrl 
+                          ? "border-primary" 
+                          : "border-primary/20 hover:border-primary/50"
+                      )}
                       onClick={() => {
-                        if (photos.length >= 2 && photo !== photos[photos.length - 1]) {
+                        if (initialPhoto && photo.signedUrl) {
                           setSelectedCompare({
-                            before: photos[photos.length - 1],
-                            after: photo,
+                            before: initialPhoto.url,
+                            after: photo.signedUrl,
+                            beforeDate: initialPhoto.date,
+                            afterDate: photo.photo_date,
                           });
                         }
                       }}
@@ -231,12 +358,15 @@ export default function Progress() {
             )}
 
             {/* Empty state */}
-            {photos.length === 0 && !shouldTakePhoto && (
+            {!initialPhoto && photos.length === 0 && (
               <HUDCard className="p-8 text-center">
                 <Camera className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">
-                  No progress photos yet. Start tracking your transformation!
+                <p className="text-muted-foreground mb-4">
+                  Complete a face scan first to establish your baseline
                 </p>
+                <Button variant="cyber" onClick={() => navigate('/face-scan')}>
+                  Start Face Scan
+                </Button>
               </HUDCard>
             )}
           </div>
