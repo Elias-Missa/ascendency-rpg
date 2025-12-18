@@ -6,7 +6,7 @@ import { CyberBackground } from '@/components/auth/CyberBackground';
 import { HUDCard } from '@/components/auth/HUDFrame';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, User, LogOut, Zap, Crown, Settings } from 'lucide-react';
+import { Loader2, User, LogOut, Zap, Crown, Settings, Shield, FileText } from 'lucide-react';
 import { calculateLevel, getXpForCurrentLevel, getXpProgress, XP_PER_LEVEL } from '@/lib/xp-utils';
 
 interface ProfileData {
@@ -153,6 +153,34 @@ export default function Profile() {
             Sign Out
           </Button>
         </div>
+
+        {/* Legal Links */}
+        <HUDCard className="p-4 mt-6">
+          <h3 className="text-sm font-semibold text-foreground mb-3">Legal</h3>
+          <div className="space-y-2">
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start h-auto py-2 px-3 text-muted-foreground hover:text-foreground"
+              onClick={() => navigate('/privacy-policy')}
+            >
+              <Shield className="w-4 h-4 mr-2" />
+              Privacy Policy
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start h-auto py-2 px-3 text-muted-foreground hover:text-foreground"
+              onClick={() => navigate('/terms-of-service')}
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Terms of Service
+            </Button>
+          </div>
+        </HUDCard>
+
+        {/* App Version */}
+        <p className="text-center text-xs text-muted-foreground mt-6 font-mono">
+          Ascendency v1.0.0
+        </p>
       </main>
     </div>
   );
