@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, Zap } from 'lucide-react';
+import { Check, Zap, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -15,6 +15,7 @@ interface TaskCardProps {
 export function TaskCard({ id, taskName, xpReward, isCompleted, onComplete }: TaskCardProps) {
   const [completing, setCompleting] = useState(false);
   const [completed, setCompleted] = useState(isCompleted);
+  const [animateComplete, setAnimateComplete] = useState(false);
   const { toast } = useToast();
 
   const handleComplete = async () => {
@@ -52,13 +53,13 @@ export function TaskCard({ id, taskName, xpReward, isCompleted, onComplete }: Ta
 
       if (updateError) throw updateError;
 
-      setCompleted(true);
-      onComplete(xpReward);
+      setAnimateComplete(true);
+      setTimeout(() => {
+        setCompleted(true);
+        setAnimateComplete(false);
+      }, 300);
       
-      toast({
-        title: `+${xpReward} XP`,
-        description: 'Quest completed! Keep pushing, Hunter.',
-      });
+      onComplete(xpReward);
     } catch (error) {
       console.error('Error completing task:', error);
       toast({
@@ -75,51 +76,51 @@ export function TaskCard({ id, taskName, xpReward, isCompleted, onComplete }: Ta
     <div
       onClick={handleComplete}
       className={cn(
-        'relative p-4 rounded-lg border transition-all duration-300 cursor-pointer group',
+        'relative p-3 rounded-lg border transition-all duration-300 cursor-pointer group overflow-hidden',
         completed
           ? 'bg-primary/10 border-primary/30'
-          : 'bg-card/50 border-border/50 hover:border-primary/50 hover:bg-card/80'
+          : 'bg-card/50 border-border/50 hover:border-primary/50 hover:bg-card/80 active:scale-[0.98]',
+        animateComplete && 'scale-[1.02]'
       )}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         {/* Checkbox */}
         <div className={cn(
-          'w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-300',
+          'w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-300 shrink-0',
           completed
             ? 'bg-primary border-primary'
-            : 'border-muted-foreground group-hover:border-primary'
+            : 'border-muted-foreground/50 group-hover:border-primary'
         )}>
-          {completed && <Check className="w-4 h-4 text-primary-foreground" />}
-          {completing && (
-            <div className="w-3 h-3 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-          )}
+          {completing ? (
+            <Loader2 className="w-3 h-3 text-muted-foreground animate-spin" />
+          ) : completed ? (
+            <Check className="w-3 h-3 text-primary-foreground" />
+          ) : null}
         </div>
 
         {/* Task Info */}
-        <div className="flex-1">
-          <p className={cn(
-            'font-medium transition-all duration-300',
-            completed && 'line-through text-muted-foreground'
-          )}>
-            {taskName}
-          </p>
-        </div>
+        <p className={cn(
+          'flex-1 text-sm font-medium transition-all duration-300 leading-tight',
+          completed && 'line-through text-muted-foreground'
+        )}>
+          {taskName}
+        </p>
 
         {/* XP Badge */}
         <div className={cn(
-          'flex items-center gap-1 px-2 py-1 rounded-full text-xs font-mono',
+          'flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-mono shrink-0 transition-all',
           completed
             ? 'bg-primary/20 text-primary'
-            : 'bg-level/20 text-level'
+            : 'bg-xp/20 text-xp'
         )}>
           <Zap className="w-3 h-3" />
-          <span>+{xpReward} XP</span>
+          <span>+{xpReward}</span>
         </div>
       </div>
 
-      {/* Glow effect on completion */}
-      {completed && (
-        <div className="absolute inset-0 rounded-lg bg-primary/5 animate-pulse-glow pointer-events-none" />
+      {/* Completion flash effect */}
+      {animateComplete && (
+        <div className="absolute inset-0 bg-primary/30 animate-ping rounded-lg" />
       )}
     </div>
   );
