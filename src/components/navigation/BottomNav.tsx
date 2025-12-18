@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, ScrollText, BookOpen, CheckSquare, Camera, User } from 'lucide-react';
+import { Home, ScrollText, BookOpen, CheckSquare, CalendarClock, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -7,7 +7,7 @@ const navItems = [
   { path: '/report', icon: ScrollText, label: 'Report' },
   { path: '/guide', icon: BookOpen, label: 'Guide' },
   { path: '/tasks', icon: CheckSquare, label: 'Tasks' },
-  { path: '/progress', icon: Camera, label: 'Progress' },
+  { path: '/schedule', icon: CalendarClock, label: 'Schedule' },
   { path: '/profile', icon: User, label: 'Profile' },
 ];
 
