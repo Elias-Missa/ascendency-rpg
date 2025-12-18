@@ -140,12 +140,15 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          best_streak: number
           created_at: string
+          current_streak: number
           current_xp: number
           face_potential_score: number | null
           free_scans_remaining: number
           id: string
           is_premium: boolean
+          last_task_date: string | null
           level: number
           scan_count: number
           updated_at: string
@@ -153,12 +156,15 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          best_streak?: number
           created_at?: string
+          current_streak?: number
           current_xp?: number
           face_potential_score?: number | null
           free_scans_remaining?: number
           id: string
           is_premium?: boolean
+          last_task_date?: string | null
           level?: number
           scan_count?: number
           updated_at?: string
@@ -166,12 +172,15 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          best_streak?: number
           created_at?: string
+          current_streak?: number
           current_xp?: number
           face_potential_score?: number | null
           free_scans_remaining?: number
           id?: string
           is_premium?: boolean
+          last_task_date?: string | null
           level?: number
           scan_count?: number
           updated_at?: string
