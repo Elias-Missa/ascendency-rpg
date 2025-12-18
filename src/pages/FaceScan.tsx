@@ -1,11 +1,12 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { HUDCard, GlowingDivider } from '@/components/auth/HUDFrame';
 import { CyberBackground } from '@/components/auth/CyberBackground';
-import { Upload, Camera, Scan, AlertTriangle, CheckCircle } from 'lucide-react';
+import { MultiImageCapture, CapturedImages, ImageType } from '@/components/face-scan/MultiImageCapture';
+import { Scan, AlertTriangle, CheckCircle, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
 type UploadState = 'idle' | 'uploading' | 'analyzing' | 'complete' | 'error';
@@ -13,100 +14,106 @@ type UploadState = 'idle' | 'uploading' | 'analyzing' | 'complete' | 'error';
 export default function FaceScan() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [uploadState, setUploadState] = useState<UploadState>('idle');
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [progress, setProgress] = useState(0);
+  const [capturedImages, setCapturedImages] = useState<CapturedImages>({
+    front: null,
+    smile: null,
+    side: null,
+  });
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleImageCapture = (type: ImageType, file: File) => {
+    setCapturedImages(prev => ({ ...prev, [type]: file }));
+  };
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
-      return;
-    }
+  const handleImageRemove = (type: ImageType) => {
+    setCapturedImages(prev => ({ ...prev, [type]: null }));
+  };
 
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('Image must be under 10MB');
-      return;
-    }
+  const allImagesUploaded = capturedImages.front && capturedImages.smile && capturedImages.side;
 
-    setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file));
+  const uploadImage = async (file: File, type: string): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user!.id}/${Date.now()}_${type}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('face-scans')
+      .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+    if (uploadError) throw new Error(`Failed to upload ${type} image`);
+
+    const { data: urlData, error: urlError } = await supabase.storage
+      .from('face-scans')
+      .createSignedUrl(fileName, 3600);
+
+    if (urlError || !urlData?.signedUrl) throw new Error(`Failed to get ${type} URL`);
+
+    return urlData.signedUrl;
   };
 
   const handleUpload = async () => {
-    if (!selectedFile || !user) return;
+    if (!allImagesUploaded || !user) return;
 
     try {
       setUploadState('uploading');
       setProgress(10);
 
-      // Generate unique filename
-      const fileExt = selectedFile.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-
-      setProgress(30);
-
-      // Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from('face-scans')
-        .upload(fileName, selectedFile, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        throw new Error('Failed to upload image');
-      }
+      // Upload all three images
+      const [frontUrl, smileUrl, sideUrl] = await Promise.all([
+        uploadImage(capturedImages.front!, 'front'),
+        uploadImage(capturedImages.smile!, 'smile'),
+        uploadImage(capturedImages.side!, 'side'),
+      ]);
 
       setProgress(50);
 
-      // Get signed URL (bucket is private)
-      const { data: urlData, error: urlError } = await supabase.storage
-        .from('face-scans')
-        .createSignedUrl(fileName, 3600); // 1 hour expiry
+      // Create face_scans record with multi-image data
+      const imagesData = {
+        front: `${user.id}/${Date.now()}_front`,
+        smile: `${user.id}/${Date.now()}_smile`,
+        side: `${user.id}/${Date.now()}_side`,
+      };
 
-      if (urlError || !urlData?.signedUrl) {
-        throw new Error('Failed to get image URL');
-      }
-
-      // Create face_scans record
       const { data: scanData, error: scanError } = await supabase
         .from('face_scans')
         .insert({
           user_id: user.id,
-          image_path: fileName,
+          image_path: imagesData.front,
+          images: imagesData,
           is_latest: true,
         })
         .select()
         .single();
 
-      if (scanError) {
-        console.error('Scan record error:', scanError);
-        throw new Error('Failed to save scan record');
-      }
+      if (scanError) throw new Error('Failed to save scan record');
+
+      // Update scan count
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('scan_count')
+        .eq('id', user.id)
+        .maybeSingle();
+      
+      await supabase
+        .from('profiles')
+        .update({ scan_count: (profileData?.scan_count || 0) + 1 })
+        .eq('id', user.id);
 
       setProgress(70);
       setUploadState('analyzing');
 
-      // Fetch survey data for context
+      // Fetch survey data
       const { data: surveyData } = await supabase
         .from('onboarding_surveys')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      // Trigger AI analysis
-      const { data: analysisResult, error: analysisError } = await supabase.functions.invoke('analyze-face', {
+      // Trigger AI analysis with all images
+      const { error: analysisError } = await supabase.functions.invoke('analyze-face', {
         body: {
-          imageUrl: urlData.signedUrl,
+          imageUrls: { front: frontUrl, smile: smileUrl, side: sideUrl },
           faceScanId: scanData.id,
           userId: user.id,
           surveyData,
@@ -115,18 +122,12 @@ export default function FaceScan() {
 
       setProgress(100);
 
-      if (analysisError) {
-        console.error('Analysis error:', analysisError);
-        throw new Error('AI analysis failed');
-      }
+      if (analysisError) throw new Error('AI analysis failed');
 
       setUploadState('complete');
       toast.success('Analysis complete! Viewing your report...');
 
-      // Navigate to report after short delay
-      setTimeout(() => {
-        navigate('/report');
-      }, 1500);
+      setTimeout(() => navigate('/report'), 1500);
 
     } catch (error) {
       console.error('Error:', error);
@@ -137,12 +138,8 @@ export default function FaceScan() {
 
   const resetUpload = () => {
     setUploadState('idle');
-    setPreviewUrl(null);
-    setSelectedFile(null);
+    setCapturedImages({ front: null, smile: null, side: null });
     setProgress(0);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
   };
 
   return (
@@ -162,48 +159,25 @@ export default function FaceScan() {
 
         {/* Upload Card */}
         <HUDCard className="mb-6">
-          {uploadState === 'idle' && !previewUrl && (
-            <div 
-              className="border-2 border-dashed border-primary/30 rounded-lg p-12 text-center cursor-pointer hover:border-primary/60 transition-colors"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="hidden"
-              />
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                <Camera className="w-8 h-8 text-primary" />
-              </div>
-              <p className="text-foreground font-medium mb-2">Click to upload your selfie</p>
-              <p className="text-muted-foreground text-sm">PNG, JPG up to 10MB</p>
-            </div>
-          )}
-
-          {previewUrl && uploadState === 'idle' && (
+          {uploadState === 'idle' && (
             <div className="space-y-6">
-              <div className="relative aspect-square max-w-sm mx-auto rounded-lg overflow-hidden border border-primary/30">
-                <img 
-                  src={previewUrl} 
-                  alt="Preview" 
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 border-4 border-primary/20 rounded-lg pointer-events-none" />
-                <div className="absolute top-2 left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-                <div className="absolute bottom-2 left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-              </div>
+              <MultiImageCapture
+                images={capturedImages}
+                onImageCapture={handleImageCapture}
+                onImageRemove={handleImageRemove}
+              />
               
-              <div className="flex gap-4 justify-center">
-                <Button variant="outline" onClick={resetUpload}>
-                  Choose Different
-                </Button>
-                <Button variant="cyber-fill" onClick={handleUpload}>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Begin Analysis
-                </Button>
-              </div>
+              {allImagesUploaded && (
+                <div className="flex gap-4 justify-center pt-4">
+                  <Button variant="outline" onClick={resetUpload}>
+                    Reset All
+                  </Button>
+                  <Button variant="cyber-fill" onClick={handleUpload}>
+                    <Upload className="w-4 h-4 mr-2" />
+                    Begin Analysis
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 

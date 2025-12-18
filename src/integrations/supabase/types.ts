@@ -58,6 +58,7 @@ export type Database = {
           created_at: string
           id: string
           image_path: string
+          images: Json | null
           is_latest: boolean
           user_id: string
         }
@@ -66,6 +67,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_path: string
+          images?: Json | null
           is_latest?: boolean
           user_id: string
         }
@@ -74,6 +76,7 @@ export type Database = {
           created_at?: string
           id?: string
           image_path?: string
+          images?: Json | null
           is_latest?: boolean
           user_id?: string
         }
@@ -140,9 +143,11 @@ export type Database = {
           created_at: string
           current_xp: number
           face_potential_score: number | null
+          free_scans_remaining: number
           id: string
           is_premium: boolean
           level: number
+          scan_count: number
           updated_at: string
           username: string | null
         }
@@ -151,9 +156,11 @@ export type Database = {
           created_at?: string
           current_xp?: number
           face_potential_score?: number | null
+          free_scans_remaining?: number
           id: string
           is_premium?: boolean
           level?: number
+          scan_count?: number
           updated_at?: string
           username?: string | null
         }
@@ -162,11 +169,40 @@ export type Database = {
           created_at?: string
           current_xp?: number
           face_potential_score?: number | null
+          free_scans_remaining?: number
           id?: string
           is_premium?: boolean
           level?: number
+          scan_count?: number
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      progress_photos: {
+        Row: {
+          created_at: string
+          id: string
+          image_path: string
+          notes: string | null
+          photo_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_path: string
+          notes?: string | null
+          photo_date?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_path?: string
+          notes?: string | null
+          photo_date?: string
+          user_id?: string
         }
         Relationships: []
       }
