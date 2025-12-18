@@ -5,20 +5,24 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { HUDCard, GlowingDivider } from '@/components/auth/HUDFrame';
 import { CyberBackground } from '@/components/auth/CyberBackground';
-import { Loader2, LogOut, User, Zap, Target, TrendingUp } from 'lucide-react';
-import { calculateLevel, getXpForCurrentLevel, XP_PER_LEVEL } from '@/lib/xp-utils';
+import { Progress } from '@/components/ui/progress';
+import { Loader2, Zap, Target, TrendingUp, Scan, BookOpen, ChevronRight } from 'lucide-react';
+import { calculateLevel, getXpForCurrentLevel, getXpProgress, XP_PER_LEVEL } from '@/lib/xp-utils';
+import { cn } from '@/lib/utils';
 
 interface ProfileData {
   current_xp: number;
   face_potential_score: number | null;
+  username: string | null;
 }
 
 export default function Index() {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [todayTaskCount, setTodayTaskCount] = useState(0);
+  const [completedTasks, setCompletedTasks] = useState(0);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -30,7 +34,6 @@ export default function Index() {
     const fetchData = async () => {
       if (!user) return;
       
-      // Check onboarding
       const { data: onboardingData } = await supabase
         .from('onboarding_surveys')
         .select('id')
@@ -39,26 +42,25 @@ export default function Index() {
       
       setHasCompletedOnboarding(!!onboardingData);
 
-      // Fetch profile
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('current_xp, face_potential_score')
+        .select('current_xp, face_potential_score, username')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (profileData) {
         setProfile(profileData);
       }
 
-      // Fetch today's tasks
       const today = new Date().toISOString().split('T')[0];
       const { data: tasksData } = await supabase
         .from('daily_tasks')
-        .select('id')
+        .select('id, is_completed')
         .eq('user_id', user.id)
         .eq('date_assigned', today);
 
       setTodayTaskCount(tasksData?.length || 0);
+      setCompletedTasks(tasksData?.filter(t => t.is_completed).length || 0);
     };
 
     if (user) {
@@ -69,9 +71,9 @@ export default function Index() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="font-mono text-muted-foreground text-sm">INITIALIZING SYSTEM...</p>
+          <p className="font-mono text-muted-foreground text-xs">INITIALIZING...</p>
         </div>
       </div>
     );
@@ -80,144 +82,182 @@ export default function Index() {
   if (!user) return null;
 
   const level = profile ? calculateLevel(profile.current_xp) : 1;
-  const xpInLevel = profile ? getXpForCurrentLevel(profile.current_xp) : 0;
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/auth');
-  };
+  const xpProgress = profile ? getXpProgress(profile.current_xp) : 0;
+  const displayName = profile?.username || user.email?.split('@')[0] || 'Hunter';
 
   return (
     <div className="min-h-screen pb-24 relative overflow-hidden">
       <CyberBackground />
       
-      {/* Header */}
-      <header className="relative z-10 border-b border-border/50 bg-background/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <main className="relative z-10 px-4 pt-4 pb-6">
+        {/* Compact Header */}
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full border-2 border-primary flex items-center justify-center animate-pulse-glow">
-              <Zap className="w-5 h-5 text-primary" />
+            <div className="w-12 h-12 rounded-full border-2 border-primary bg-primary/10 flex items-center justify-center animate-pulse-glow">
+              <span className="text-lg font-display font-bold text-primary">{level}</span>
             </div>
             <div>
-              <h1 className="font-display text-xl font-bold tracking-wider">ASCENDENCY</h1>
-              <p className="text-xs font-mono text-muted-foreground">HUNTER SYSTEM v1.0</p>
+              <p className="text-xs font-mono text-muted-foreground">WELCOME BACK</p>
+              <h1 className="font-display text-lg font-bold leading-tight">{displayName.toUpperCase()}</h1>
             </div>
           </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium">{user.email}</p>
-              <p className="text-xs font-mono text-primary">LEVEL 1 HUNTER</p>
-            </div>
-            <Button variant="cyber-ghost" size="sm" onClick={handleSignOut}>
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Logout</span>
-            </Button>
+          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 border border-primary/30">
+            <Zap className="w-3 h-3 text-primary" />
+            <span className="text-xs font-mono text-primary">{profile?.current_xp || 0} XP</span>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="relative z-10 container mx-auto px-4 py-8">
-        {/* Welcome Section */}
-        <div className="text-center mb-12 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/5 mb-4">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-sm font-mono text-primary">SYSTEM ONLINE</span>
+        {/* XP Progress Bar */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] font-mono text-muted-foreground">LEVEL {level}</span>
+            <span className="text-[10px] font-mono text-muted-foreground">LEVEL {level + 1}</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 glow-text">
-            WELCOME, HUNTER
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            Your journey to peak aesthetics begins here. The system will guide your transformation.
-          </p>
+          <Progress value={xpProgress} className="h-2" />
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {[
-            { icon: User, label: 'Current Level', value: level.toString(), subtext: `${xpInLevel} / ${XP_PER_LEVEL} XP` },
-            { icon: Target, label: 'Face Score', value: profile?.face_potential_score?.toString() || '--', subtext: profile?.face_potential_score ? 'Analysis Complete' : 'Scan Required' },
-            { icon: TrendingUp, label: 'Tasks Today', value: todayTaskCount.toString(), subtext: todayTaskCount > 0 ? 'Tasks assigned' : 'No tasks assigned' },
-          ].map(({ icon: Icon, label, value, subtext }, i) => (
-            <HUDCard 
-              key={label} 
-              className="p-6 animate-fade-in" 
-              style={{ animationDelay: `${0.2 + i * 0.1}s` }}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="w-12 h-12 rounded-lg border border-primary/30 bg-primary/5 flex items-center justify-center">
-                  <Icon className="w-6 h-6 text-primary" />
-                </div>
-                <span className="text-xs font-mono text-muted-foreground uppercase">{label}</span>
+        {/* Stats Row - Compact */}
+        <div className="grid grid-cols-3 gap-2 mb-5">
+          <HUDCard className="p-3 text-center">
+            <p className="text-2xl font-display font-bold text-primary">{level}</p>
+            <p className="text-[10px] font-mono text-muted-foreground">LEVEL</p>
+          </HUDCard>
+          <HUDCard className="p-3 text-center">
+            <p className="text-2xl font-display font-bold text-foreground">
+              {profile?.face_potential_score || '--'}
+            </p>
+            <p className="text-[10px] font-mono text-muted-foreground">FACE SCORE</p>
+          </HUDCard>
+          <HUDCard className="p-3 text-center">
+            <p className="text-2xl font-display font-bold text-foreground">
+              {completedTasks}/{todayTaskCount}
+            </p>
+            <p className="text-[10px] font-mono text-muted-foreground">TASKS</p>
+          </HUDCard>
+        </div>
+
+        {/* Primary CTA - Face Scan */}
+        {!profile?.face_potential_score && (
+          <HUDCard 
+            className="p-4 mb-4 border-primary/50 bg-gradient-to-r from-primary/10 to-transparent"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
+                <Scan className="w-7 h-7 text-primary" />
               </div>
-              <div className="text-4xl font-display font-bold text-foreground mb-1">{value}</div>
-              <p className="text-sm font-mono text-muted-foreground">{subtext}</p>
-            </HUDCard>
-          ))}
+              <div className="flex-1 min-w-0">
+                <h3 className="font-display font-semibold text-sm mb-0.5">START FACE ANALYSIS</h3>
+                <p className="text-xs text-muted-foreground line-clamp-2">
+                  Unlock your personalized looksmax plan with AI analysis
+                </p>
+              </div>
+              <Button 
+                variant="cyber-fill" 
+                size="sm"
+                onClick={() => navigate('/face-scan')}
+                className="shrink-0"
+              >
+                <Zap className="w-4 h-4" />
+              </Button>
+            </div>
+          </HUDCard>
+        )}
+
+        {/* Onboarding CTA if not completed */}
+        {!hasCompletedOnboarding && (
+          <HUDCard className="p-4 mb-4 border-yellow-500/30 bg-gradient-to-r from-yellow-500/10 to-transparent">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-lg bg-yellow-500/20 flex items-center justify-center shrink-0">
+                <Target className="w-7 h-7 text-yellow-500" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-display font-semibold text-sm mb-0.5">COMPLETE SURVEY</h3>
+                <p className="text-xs text-muted-foreground line-clamp-2">
+                  Calibrate the system with your profile data
+                </p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/onboarding')}
+                className="shrink-0 border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </HUDCard>
+        )}
+
+        <GlowingDivider className="my-5" />
+
+        {/* Quick Actions Grid */}
+        <h2 className="text-xs font-mono text-muted-foreground mb-3">QUICK ACTIONS</h2>
+        <div className="grid grid-cols-2 gap-3 mb-5">
+          <QuickActionCard
+            icon={TrendingUp}
+            label="VIEW REPORT"
+            description="Your quests"
+            onClick={() => navigate('/report')}
+          />
+          <QuickActionCard
+            icon={Target}
+            label="DAILY TASKS"
+            description={`${todayTaskCount} tasks`}
+            onClick={() => navigate('/tasks')}
+          />
+          <QuickActionCard
+            icon={BookOpen}
+            label="GUIDE"
+            description="Learn more"
+            onClick={() => navigate('/guide')}
+          />
+          <QuickActionCard
+            icon={Scan}
+            label="NEW SCAN"
+            description="Analyze face"
+            onClick={() => navigate('/face-scan')}
+          />
         </div>
 
-        {/* Quick Actions */}
-        <GlowingDivider className="mb-8" />
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <HUDCard className="p-6 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-            <h3 className="font-display text-lg font-semibold mb-2">FACE ANALYSIS</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Upload your photo for AI-powered facial analysis and personalized recommendations.
-            </p>
-            <Button 
-              variant="cyber-fill"
-              className="w-full" 
-              onClick={() => navigate('/face-scan')}
-            >
-              <Zap className="w-4 h-4" />
-              Start Scan
-            </Button>
-          </HUDCard>
-
-          <HUDCard className="p-6 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <h3 className="font-display text-lg font-semibold mb-2">HUNTER REGISTRATION</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              {hasCompletedOnboarding 
-                ? 'Your calibration is complete. You can update it anytime.'
-                : 'Complete your profile survey to unlock personalized recommendations.'}
-            </p>
-            <Button 
-              variant={hasCompletedOnboarding ? 'cyber-ghost' : 'cyber-fill'}
-              className="w-full" 
-              onClick={() => navigate('/onboarding')}
-            >
-              <Target className="w-4 h-4" />
-              {hasCompletedOnboarding ? 'Update Survey' : 'Begin Calibration'}
-            </Button>
-          </HUDCard>
-
-          <HUDCard className="p-6 animate-fade-in" style={{ animationDelay: '0.7s' }}>
-            <h3 className="font-display text-lg font-semibold mb-2">VIEW REPORT</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Access your personalized looksmax report with prioritized quests and recommendations.
-            </p>
-            <Button 
-              variant="cyber-fill"
-              className="w-full" 
-              onClick={() => navigate('/report')}
-            >
-              <TrendingUp className="w-4 h-4" />
-              Open Report
-            </Button>
-          </HUDCard>
-        </div>
-
-        {/* System Status */}
-        <div className="mt-12 text-center">
-          <p className="text-xs font-mono text-muted-foreground">
-            SYSTEM STATUS: <span className="text-primary">OPERATIONAL</span> | 
-            BACKEND: <span className="text-primary">CONNECTED</span> | 
-            AUTH: <span className="text-primary">ACTIVE</span>
+        {/* System Status - Compact */}
+        <div className="flex items-center justify-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+          <p className="text-[10px] font-mono text-muted-foreground">
+            SYSTEM OPERATIONAL
           </p>
         </div>
       </main>
+    </div>
+  );
+}
+
+function QuickActionCard({ 
+  icon: Icon, 
+  label, 
+  description, 
+  onClick 
+}: { 
+  icon: React.ElementType; 
+  label: string; 
+  description: string;
+  onClick: () => void;
+}) {
+  return (
+    <div 
+      className="cursor-pointer active:scale-[0.98] transition-transform"
+      onClick={onClick}
+    >
+      <HUDCard className="p-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+            <Icon className="w-5 h-5 text-primary" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-display font-semibold leading-tight truncate">{label}</p>
+            <p className="text-[10px] font-mono text-muted-foreground truncate">{description}</p>
+          </div>
+        </div>
+      </HUDCard>
     </div>
   );
 }
