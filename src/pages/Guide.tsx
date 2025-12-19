@@ -61,7 +61,7 @@ export default function Guide() {
           <img 
             src={guideCharacter} 
             alt="Ascension Guide Character" 
-            className="mx-auto h-[70vh] w-auto max-w-none object-contain sm:h-auto sm:w-full sm:max-w-4xl"
+            className="mx-auto h-[60vh] w-auto max-w-none object-contain sm:h-auto sm:w-full sm:max-w-4xl"
           />
           
           {/* Face - at the chin area */}
