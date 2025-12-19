@@ -52,43 +52,45 @@ export default function Guide() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen pb-24 relative overflow-hidden bg-black">
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
+    <div className="h-screen fixed inset-0 overflow-hidden bg-black flex items-center justify-center">
+      <main className="relative z-10 flex flex-col items-center justify-center w-full h-full px-4">
         {/* Interactive Character Image */}
-        <div className="relative w-full max-w-lg">
-          <img 
-            src={guideCharacter} 
-            alt="Ascension Guide Character" 
-            className="w-full h-auto object-contain"
-          />
-          
-          {/* Face - at the chin area */}
-          <LabeledZone 
-            path="/guide/face" 
-            label="Face"
-            className="top-[28%] left-1/2 -translate-x-1/2 w-20 h-10 flex items-center justify-center"
-          />
-          
-          {/* Body - lower near the belly */}
-          <LabeledZone 
-            path="/guide/body" 
-            label="Body"
-            className="top-[55%] left-1/2 -translate-x-1/2 w-20 h-12 flex items-center justify-center"
-          />
-          
-          {/* Hygiene - in left hand */}
-          <LabeledZone 
-            path="/guide/hygiene" 
-            label="Hygiene"
-            className="top-[78%] left-[12%] w-24 h-14 flex items-center justify-center"
-          />
-          
-          {/* Style - in right hand */}
-          <LabeledZone 
-            path="/guide/style" 
-            label="Style"
-            className="top-[78%] right-[12%] w-20 h-14 flex items-center justify-center"
-          />
+        <div className="relative w-full max-w-md h-full flex items-center justify-center">
+          <div className="relative w-full">
+            <img 
+              src={guideCharacter} 
+              alt="Ascension Guide Character" 
+              className="w-full h-auto object-contain max-h-[85vh]"
+            />
+            
+            {/* Face - at the chin area */}
+            <LabeledZone 
+              path="/guide/face" 
+              label="Face"
+              className="top-[28%] left-1/2 -translate-x-1/2 w-20 h-10 flex items-center justify-center"
+            />
+            
+            {/* Body - lower near the belly */}
+            <LabeledZone 
+              path="/guide/body" 
+              label="Body"
+              className="top-[55%] left-1/2 -translate-x-1/2 w-20 h-12 flex items-center justify-center"
+            />
+            
+            {/* Hygiene - over left hand */}
+            <LabeledZone 
+              path="/guide/hygiene" 
+              label="Hygiene"
+              className="top-[82%] left-[8%] w-24 h-14 flex items-center justify-center"
+            />
+            
+            {/* Style - over right hand */}
+            <LabeledZone 
+              path="/guide/style" 
+              label="Style"
+              className="top-[82%] right-[8%] w-20 h-14 flex items-center justify-center"
+            />
+          </div>
         </div>
       </main>
     </div>
