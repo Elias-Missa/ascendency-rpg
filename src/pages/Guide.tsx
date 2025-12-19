@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 import { CyberBackground } from '@/components/auth/CyberBackground';
-import guideCharacter from '@/assets/guide-character.png';
+import guideCharacter from '@/assets/guide-character-v2.png';
 
 interface LabeledZoneProps {
   path: string;
