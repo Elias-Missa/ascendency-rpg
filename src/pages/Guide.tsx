@@ -83,10 +83,10 @@ export default function Guide() {
           <LabeledZone path="/guide/body" label="Body" className="top-[55%] left-1/2 -translate-x-1/2 w-10 h-10" />
 
           {/* Hygiene - in left hand */}
-          <LabeledZone path="/guide/hygiene" label="Hygiene" className="top-[52%] left-[10%] w-8 h-8" />
+          <LabeledZone path="/guide/hygiene" label="Hygiene" className="top-[52%] left-[2%] w-8 h-8" />
 
           {/* Style - in right hand */}
-          <LabeledZone path="/guide/style" label="Style" className="top-[52%] right-[10%] w-8 h-8" />
+          <LabeledZone path="/guide/style" label="Style" className="top-[52%] right-[2%] w-8 h-8" />
         </div>
       </main>
     </div>
