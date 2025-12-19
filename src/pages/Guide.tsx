@@ -53,7 +53,7 @@ export default function Guide() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen pb-24 relative overflow-hidden">
+    <div className="min-h-screen pb-24 relative overflow-hidden bg-background">
       <CyberBackground />
       <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
         {/* Interactive Character Image */}
