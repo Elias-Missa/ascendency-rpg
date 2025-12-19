@@ -21,22 +21,22 @@ function LabeledZone({ path, label, className }: LabeledZoneProps) {
       className={`absolute cursor-pointer transition-all duration-300 hover:scale-110 group ${className}`}
     >
       {/* Outer pulsing ring */}
-      <div className="absolute inset-[-6px] rounded-full border-2 border-[hsl(270,100%,70%)]/60 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
+      <div className="absolute inset-[-8px] rounded-full border-2 border-[hsl(200,100%,70%)]/50 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
       
-      {/* Static outer ring */}
-      <div className="absolute inset-[-4px] rounded-full border border-[hsl(270,100%,60%)]/80 group-hover:border-[hsl(270,100%,80%)] transition-colors" />
+      {/* Outer glow aura */}
+      <div className="absolute inset-[-4px] rounded-full bg-[hsl(200,100%,60%)] blur-lg opacity-70 group-hover:opacity-90 transition-opacity" />
       
-      {/* Glow effect */}
-      <div className="absolute inset-0 rounded-full bg-[hsl(270,100%,60%)] blur-md opacity-60 group-hover:opacity-80 transition-opacity" />
+      {/* Main opaque orb */}
+      <div className="absolute inset-0 rounded-full bg-[hsl(200,80%,55%)] shadow-[0_0_20px_hsl(200,100%,60%),0_0_40px_hsl(200,100%,50%)/50] group-hover:shadow-[0_0_30px_hsl(200,100%,70%),0_0_50px_hsl(200,100%,60%)] transition-shadow" />
       
-      {/* Solid core */}
-      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[hsl(270,100%,75%)] to-[hsl(280,100%,55%)] shadow-[0_0_15px_hsl(270,100%,60%)] group-hover:shadow-[0_0_25px_hsl(270,100%,70%)] transition-shadow" />
+      {/* Inner lighter core */}
+      <div className="absolute inset-[15%] rounded-full bg-gradient-to-br from-[hsl(200,100%,75%)] to-[hsl(200,80%,60%)]" />
       
-      {/* Inner highlight */}
-      <div className="absolute inset-[30%] rounded-full bg-white/70 blur-[1px]" />
+      {/* Top highlight */}
+      <div className="absolute inset-[25%] rounded-full bg-gradient-to-b from-white/50 to-transparent" style={{ height: '40%' }} />
 
-      {/* Label */}
-      <span className="absolute top-full left-1/2 -translate-x-1/2 mt-3 whitespace-nowrap text-[10px] font-semibold uppercase tracking-widest text-[hsl(270,100%,85%)] drop-shadow-[0_0_6px_hsl(270,100%,60%)] group-hover:text-white transition-colors">
+      {/* Label inside orb */}
+      <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold uppercase tracking-wider text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
         {label}
       </span>
     </button>
