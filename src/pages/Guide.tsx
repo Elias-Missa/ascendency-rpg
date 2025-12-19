@@ -67,6 +67,13 @@ export default function Guide() {
     <div className="min-h-screen pb-24 relative overflow-hidden bg-background">
       <CyberBackground />
       <main className="relative z-10 flex flex-col items-center justify-end min-h-screen px-2 sm:px-4 pb-14">
+        {/* Title */}
+        <h1 className="absolute top-6 left-1/2 -translate-x-1/2 text-2xl sm:text-3xl md:text-4xl font-bold uppercase tracking-[0.2em] text-center">
+          <span className="bg-gradient-to-r from-[hsl(200,100%,70%)] via-[hsl(180,100%,60%)] to-[hsl(200,100%,70%)] bg-clip-text text-transparent drop-shadow-[0_0_20px_hsl(200,100%,60%/0.5)]">
+            Full LooksMaxing Guide
+          </span>
+        </h1>
+        
         {/* Interactive Character Image */}
         <div className="relative w-full px-2 sm:px-4 flex justify-center">
           <img
