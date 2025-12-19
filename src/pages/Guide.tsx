@@ -21,22 +21,22 @@ function LabeledZone({ path, label, className }: LabeledZoneProps) {
       className={`absolute cursor-pointer transition-all duration-300 hover:scale-110 group ${className}`}
     >
       {/* Outer pulsing ring */}
-      <div className="absolute inset-[-8px] rounded-full border-2 border-[hsl(200,100%,70%)]/50 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
+      <div className="absolute inset-[-10px] rounded-full border-2 border-[hsl(200,100%,70%)]/40 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
       
       {/* Outer glow aura */}
-      <div className="absolute inset-[-4px] rounded-full bg-[hsl(200,100%,60%)] blur-lg opacity-70 group-hover:opacity-90 transition-opacity" />
+      <div className="absolute inset-[-6px] rounded-full bg-[hsl(200,100%,55%)] blur-xl opacity-80 group-hover:opacity-100 transition-opacity" />
       
       {/* Main opaque orb */}
-      <div className="absolute inset-0 rounded-full bg-[hsl(200,80%,55%)] shadow-[0_0_20px_hsl(200,100%,60%),0_0_40px_hsl(200,100%,50%)/50] group-hover:shadow-[0_0_30px_hsl(200,100%,70%),0_0_50px_hsl(200,100%,60%)] transition-shadow" />
+      <div className="absolute inset-0 rounded-full bg-[hsl(200,70%,50%)] shadow-[0_0_25px_hsl(200,100%,55%),0_0_50px_hsl(200,100%,45%)/60] group-hover:shadow-[0_0_35px_hsl(200,100%,65%),0_0_60px_hsl(200,100%,55%)] transition-shadow" />
       
       {/* Inner lighter core */}
-      <div className="absolute inset-[15%] rounded-full bg-gradient-to-br from-[hsl(200,100%,75%)] to-[hsl(200,80%,60%)]" />
+      <div className="absolute inset-[12%] rounded-full bg-gradient-to-br from-[hsl(200,90%,65%)] to-[hsl(200,70%,50%)]" />
       
       {/* Top highlight */}
-      <div className="absolute inset-[25%] rounded-full bg-gradient-to-b from-white/50 to-transparent" style={{ height: '40%' }} />
+      <div className="absolute inset-[20%] rounded-full bg-gradient-to-b from-white/40 to-transparent" style={{ height: '35%' }} />
 
       {/* Label inside orb */}
-      <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold uppercase tracking-wider text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+      <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold uppercase tracking-wide text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
         {label}
       </span>
     </button>
@@ -76,16 +76,16 @@ export default function Guide() {
           />
 
           {/* Face - above the character's head */}
-          <LabeledZone path="/guide/face" label="Face" className="top-[-0.5%] left-1/2 -translate-x-1/2 w-10 h-10" />
+          <LabeledZone path="/guide/face" label="Face" className="top-[-0.5%] left-1/2 -translate-x-1/2 w-14 h-14" />
 
           {/* Body - center torso */}
-          <LabeledZone path="/guide/body" label="Body" className="top-[55%] left-1/2 -translate-x-1/2 w-10 h-10" />
+          <LabeledZone path="/guide/body" label="Body" className="top-[55%] left-1/2 -translate-x-1/2 w-14 h-14" />
 
           {/* Hygiene - in left hand */}
-          <LabeledZone path="/guide/hygiene" label="Hygiene" className="top-[52%] left-[2%] w-8 h-8" />
+          <LabeledZone path="/guide/hygiene" label="Hygiene" className="top-[52%] left-[2%] w-14 h-14" />
 
           {/* Style - in right hand */}
-          <LabeledZone path="/guide/style" label="Style" className="top-[52%] right-[2%] w-8 h-8" />
+          <LabeledZone path="/guide/style" label="Style" className="top-[52%] right-[2%] w-14 h-14" />
         </div>
       </main>
     </div>
