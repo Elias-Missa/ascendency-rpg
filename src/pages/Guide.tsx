@@ -80,7 +80,7 @@ export default function Guide() {
           <LabeledZone 
             path="/guide/face" 
             label="Face"
-            className="top-[4%] left-1/2 -translate-x-1/2 w-10 h-10"
+            className="top-[1%] left-1/2 -translate-x-1/2 w-10 h-10"
           />
           
           {/* Body - center torso */}
@@ -94,14 +94,14 @@ export default function Guide() {
           <LabeledZone 
             path="/guide/hygiene" 
             label="Hygiene"
-            className="top-[68%] left-[22%] w-8 h-8"
+            className="top-[62%] left-[18%] w-8 h-8"
           />
           
           {/* Style - in right hand */}
           <LabeledZone 
             path="/guide/style" 
             label="Style"
-            className="top-[68%] right-[22%] w-8 h-8"
+            className="top-[62%] right-[18%] w-8 h-8"
           />
         </div>
       </main>
