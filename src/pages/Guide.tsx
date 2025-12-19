@@ -4,23 +4,29 @@ import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 import guideCharacter from '@/assets/guide-character.png';
 
-interface ClickZoneProps {
+interface LabeledZoneProps {
   path: string;
+  label: string;
   className: string;
-  ariaLabel: string;
 }
 
-function ClickZone({ path, className, ariaLabel }: ClickZoneProps) {
+function LabeledZone({ path, label, className }: LabeledZoneProps) {
   const navigate = useNavigate();
   
   return (
     <button
       onClick={() => navigate(path)}
-      aria-label={ariaLabel}
-      className={`absolute cursor-pointer transition-all duration-300 hover:scale-110 ${className}`}
+      aria-label={`${label} Guide`}
+      className={`absolute cursor-pointer transition-all duration-300 hover:scale-110 group ${className}`}
     >
-      {/* Invisible clickable area with hover glow effect */}
-      <div className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity duration-300 bg-primary/20 blur-xl" />
+      {/* Glowing energy orb effect */}
+      <div className="absolute inset-0 rounded-full bg-primary/30 blur-xl animate-pulse" />
+      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/50 to-accent/30 blur-md group-hover:blur-lg transition-all" />
+      
+      {/* Label text */}
+      <span className="relative z-10 text-sm font-bold uppercase tracking-wider text-primary-foreground drop-shadow-[0_0_10px_hsl(var(--primary))] group-hover:drop-shadow-[0_0_20px_hsl(var(--primary))] transition-all">
+        {label}
+      </span>
     </button>
   );
 }
@@ -47,43 +53,41 @@ export default function Guide() {
 
   return (
     <div className="min-h-screen pb-24 relative overflow-hidden bg-background">
-      {/* The image includes its own background */}
       <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
         {/* Interactive Character Image */}
-        <div className="relative w-full max-w-md aspect-square">
+        <div className="relative w-full max-w-lg">
           <img 
             src={guideCharacter} 
             alt="Ascension Guide Character" 
-            className="w-full h-full object-contain"
+            className="w-full h-auto object-contain"
           />
           
-          {/* Click zones positioned over the labeled areas in the image */}
-          {/* Face - over the glowing face area */}
-          <ClickZone 
+          {/* Face - over the glowing eyes */}
+          <LabeledZone 
             path="/guide/face" 
-            ariaLabel="Face Guide"
-            className="top-[25%] left-1/2 -translate-x-1/2 w-24 h-16"
+            label="Face"
+            className="top-[8%] left-1/2 -translate-x-1/2 w-24 h-10 flex items-center justify-center"
           />
           
-          {/* Hygiene - over the left orb */}
-          <ClickZone 
+          {/* Hygiene - above left hand */}
+          <LabeledZone 
             path="/guide/hygiene" 
-            ariaLabel="Hygiene Guide"
-            className="top-[45%] left-[12%] w-20 h-20"
+            label="Hygiene"
+            className="top-[55%] left-[5%] w-24 h-16 flex items-center justify-center"
           />
           
-          {/* Style - over the right orb */}
-          <ClickZone 
+          {/* Style - above right hand */}
+          <LabeledZone 
             path="/guide/style" 
-            ariaLabel="Style Guide"
-            className="top-[45%] right-[12%] w-20 h-20"
+            label="Style"
+            className="top-[55%] right-[5%] w-24 h-16 flex items-center justify-center"
           />
           
-          {/* Body - over the body text area */}
-          <ClickZone 
+          {/* Body - over the chest/body area */}
+          <LabeledZone 
             path="/guide/body" 
-            ariaLabel="Body Guide"
-            className="top-[52%] left-1/2 -translate-x-1/2 w-20 h-12"
+            label="Body"
+            className="top-[35%] left-1/2 -translate-x-1/2 w-20 h-12 flex items-center justify-center"
           />
         </div>
       </main>
