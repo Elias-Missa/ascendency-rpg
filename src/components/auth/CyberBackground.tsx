@@ -113,8 +113,9 @@ export function CyberBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 -z-10"
-      style={{ background: 'hsl(0 0% 4%)' }}
+      aria-hidden="true"
+      className="fixed inset-0 z-0 pointer-events-none"
+      style={{ background: 'hsl(var(--background))' }}
     />
   );
 }
