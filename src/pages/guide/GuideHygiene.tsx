@@ -79,10 +79,10 @@ export default function GuideHygiene() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen pb-24 relative overflow-hidden">
+    <div className="min-h-screen pb-24 relative overflow-y-auto">
       <CyberBackground />
 
-      <main className="relative z-10 container mx-auto px-4 py-6">
+      <main className="relative z-10 container mx-auto px-4 py-6 overflow-visible">
         {/* Header with back button */}
         <div className="flex items-center gap-4 mb-6">
           <Button 
