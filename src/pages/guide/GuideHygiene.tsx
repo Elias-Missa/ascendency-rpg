@@ -79,7 +79,7 @@ export default function GuideHygiene() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen pb-24 relative overflow-y-auto">
+    <div className="h-[100dvh] pb-24 relative overflow-y-auto overflow-x-hidden overscroll-contain">
       <CyberBackground />
 
       <main className="relative z-10 container mx-auto px-4 py-6 overflow-visible">
