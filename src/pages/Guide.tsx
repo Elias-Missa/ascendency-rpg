@@ -67,7 +67,7 @@ export default function Guide() {
   return (
     <div className="min-h-screen pb-24 relative overflow-hidden bg-background">
       <CyberBackground />
-      <main className="relative z-10 flex flex-col items-center justify-end min-h-screen px-2 sm:px-4 pb-4">
+      <main className="relative z-10 flex flex-col items-center justify-end min-h-screen px-2 sm:px-4 pb-8">
         {/* Interactive Character Image */}
         <div className="relative w-full px-2 sm:px-4 flex justify-center">
           <img 
