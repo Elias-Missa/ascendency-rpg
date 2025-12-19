@@ -19,12 +19,12 @@ function LabeledZone({ path, label, className }: LabeledZoneProps) {
       aria-label={`${label} Guide`}
       className={`absolute cursor-pointer transition-all duration-300 hover:scale-110 group ${className}`}
     >
-      {/* Glowing energy orb effect */}
-      <div className="absolute inset-0 rounded-full bg-primary/30 blur-xl animate-pulse" />
-      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/50 to-accent/30 blur-md group-hover:blur-lg transition-all" />
+      {/* Purple glowing energy orb effect */}
+      <div className="absolute inset-0 rounded-full bg-[hsl(270,100%,50%)]/40 blur-xl animate-pulse" />
+      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[hsl(270,100%,60%)]/60 to-[hsl(280,100%,40%)]/40 blur-md group-hover:blur-lg transition-all" />
       
-      {/* Label text */}
-      <span className="relative z-10 text-sm font-bold uppercase tracking-wider text-primary-foreground drop-shadow-[0_0_10px_hsl(var(--primary))] group-hover:drop-shadow-[0_0_20px_hsl(var(--primary))] transition-all">
+      {/* Label text with purple glow */}
+      <span className="relative z-10 text-sm font-bold uppercase tracking-wider text-white drop-shadow-[0_0_15px_hsl(270,100%,70%)] group-hover:drop-shadow-[0_0_25px_hsl(270,100%,80%)] transition-all">
         {label}
       </span>
     </button>
@@ -62,32 +62,32 @@ export default function Guide() {
             className="w-full h-auto object-contain"
           />
           
-          {/* Face - over the glowing eyes */}
+          {/* Face - over the glowing purple eyes */}
           <LabeledZone 
             path="/guide/face" 
             label="Face"
-            className="top-[8%] left-1/2 -translate-x-1/2 w-24 h-10 flex items-center justify-center"
+            className="top-[12%] left-1/2 -translate-x-1/2 w-20 h-10 flex items-center justify-center"
           />
           
-          {/* Hygiene - above left hand */}
-          <LabeledZone 
-            path="/guide/hygiene" 
-            label="Hygiene"
-            className="top-[55%] left-[5%] w-24 h-16 flex items-center justify-center"
-          />
-          
-          {/* Style - above right hand */}
-          <LabeledZone 
-            path="/guide/style" 
-            label="Style"
-            className="top-[55%] right-[5%] w-24 h-16 flex items-center justify-center"
-          />
-          
-          {/* Body - over the chest/body area */}
+          {/* Body - over the midsection/chest area */}
           <LabeledZone 
             path="/guide/body" 
             label="Body"
-            className="top-[35%] left-1/2 -translate-x-1/2 w-20 h-12 flex items-center justify-center"
+            className="top-[40%] left-1/2 -translate-x-1/2 w-20 h-12 flex items-center justify-center"
+          />
+          
+          {/* Hygiene - in left hand */}
+          <LabeledZone 
+            path="/guide/hygiene" 
+            label="Hygiene"
+            className="top-[62%] left-[8%] w-24 h-14 flex items-center justify-center"
+          />
+          
+          {/* Style - in right hand */}
+          <LabeledZone 
+            path="/guide/style" 
+            label="Style"
+            className="top-[62%] right-[8%] w-20 h-14 flex items-center justify-center"
           />
         </div>
       </main>
