@@ -20,7 +20,7 @@ export function HUDFrame({ children, className = '', style }: HUDFrameProps) {
 
 export function HUDCard({ children, className = '', style }: HUDFrameProps) {
   return (
-    <div className={`relative bg-card/80 backdrop-blur-sm border border-border overflow-hidden ${className}`} style={style}>
+    <div className={`relative bg-card/80 backdrop-blur-sm border border-border ${className}`} style={style}>
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent opacity-50" />
       </div>
