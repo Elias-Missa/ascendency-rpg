@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
+import { CyberBackground } from '@/components/auth/CyberBackground';
 import guideCharacter from '@/assets/guide-character.png';
 
 interface LabeledZoneProps {
@@ -52,7 +53,8 @@ export default function Guide() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen pb-24 relative overflow-hidden bg-black">
+    <div className="min-h-screen pb-24 relative overflow-hidden">
+      <CyberBackground />
       <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
         {/* Interactive Character Image */}
         <div className="relative w-full max-w-lg">
