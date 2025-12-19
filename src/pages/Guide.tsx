@@ -24,16 +24,16 @@ function LabeledZone({ path, label, className }: LabeledZoneProps) {
       <div className="absolute inset-[-10px] rounded-full border-2 border-[hsl(200,100%,70%)]/40 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
       
       {/* Outer glow aura */}
-      <div className="absolute inset-[-6px] rounded-full bg-[hsl(200,100%,55%)] blur-xl opacity-80 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute inset-[-6px] rounded-full bg-[hsl(200,100%,55%)]/50 blur-xl group-hover:opacity-80 transition-opacity" />
       
       {/* Main opaque orb */}
-      <div className="absolute inset-0 rounded-full bg-[hsl(200,70%,50%)] shadow-[0_0_25px_hsl(200,100%,55%),0_0_50px_hsl(200,100%,45%)/60] group-hover:shadow-[0_0_35px_hsl(200,100%,65%),0_0_60px_hsl(200,100%,55%)] transition-shadow" />
+      <div className="absolute inset-0 rounded-full bg-[hsl(200,70%,50%)]/50 shadow-[0_0_25px_hsl(200,100%,55%)/50,0_0_50px_hsl(200,100%,45%)/30] group-hover:shadow-[0_0_35px_hsl(200,100%,65%),0_0_60px_hsl(200,100%,55%)] transition-shadow" />
       
       {/* Inner lighter core */}
-      <div className="absolute inset-[12%] rounded-full bg-gradient-to-br from-[hsl(200,90%,65%)] to-[hsl(200,70%,50%)]" />
+      <div className="absolute inset-[12%] rounded-full bg-gradient-to-br from-[hsl(200,90%,65%)]/50 to-[hsl(200,70%,50%)]/50" />
       
       {/* Top highlight */}
-      <div className="absolute inset-[20%] rounded-full bg-gradient-to-b from-white/40 to-transparent" style={{ height: '35%' }} />
+      <div className="absolute inset-[20%] rounded-full bg-gradient-to-b from-white/20 to-transparent" style={{ height: '35%' }} />
 
       {/* Label inside orb */}
       <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold uppercase tracking-wide text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]">
