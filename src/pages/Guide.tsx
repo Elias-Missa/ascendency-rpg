@@ -55,13 +55,13 @@ export default function Guide() {
   return (
     <div className="min-h-screen pb-24 relative overflow-hidden bg-background">
       <CyberBackground />
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-2 sm:px-4">
         {/* Interactive Character Image */}
         <div className="relative w-full px-2 sm:px-4">
           <img 
             src={guideCharacter} 
             alt="Ascension Guide Character" 
-            className="w-full max-w-5xl mx-auto h-auto object-contain"
+            className="mx-auto h-[78vh] w-auto max-w-none object-contain sm:h-auto sm:w-full sm:max-w-5xl"
           />
           
           {/* Face - at the chin area */}
