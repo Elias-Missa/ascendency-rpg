@@ -57,7 +57,7 @@ export default function Guide() {
       <CyberBackground />
       <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
         {/* Interactive Character Image */}
-        <div className="relative w-full max-w-lg">
+        <div className="relative w-full max-w-2xl">
           <img 
             src={guideCharacter} 
             alt="Ascension Guide Character" 
