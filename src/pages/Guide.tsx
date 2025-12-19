@@ -52,7 +52,7 @@ export default function Guide() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen pb-24 relative overflow-hidden bg-background">
+    <div className="min-h-screen pb-24 relative overflow-hidden bg-black">
       <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
         {/* Interactive Character Image */}
         <div className="relative w-full max-w-lg">
@@ -62,32 +62,32 @@ export default function Guide() {
             className="w-full h-auto object-contain"
           />
           
-          {/* Face - over the glowing purple eyes */}
+          {/* Face - at the chin area */}
           <LabeledZone 
             path="/guide/face" 
             label="Face"
-            className="top-[12%] left-1/2 -translate-x-1/2 w-20 h-10 flex items-center justify-center"
+            className="top-[28%] left-1/2 -translate-x-1/2 w-20 h-10 flex items-center justify-center"
           />
           
-          {/* Body - over the midsection/chest area */}
+          {/* Body - lower near the belly */}
           <LabeledZone 
             path="/guide/body" 
             label="Body"
-            className="top-[40%] left-1/2 -translate-x-1/2 w-20 h-12 flex items-center justify-center"
+            className="top-[55%] left-1/2 -translate-x-1/2 w-20 h-12 flex items-center justify-center"
           />
           
           {/* Hygiene - in left hand */}
           <LabeledZone 
             path="/guide/hygiene" 
             label="Hygiene"
-            className="top-[62%] left-[8%] w-24 h-14 flex items-center justify-center"
+            className="top-[78%] left-[12%] w-24 h-14 flex items-center justify-center"
           />
           
           {/* Style - in right hand */}
           <LabeledZone 
             path="/guide/style" 
             label="Style"
-            className="top-[62%] right-[8%] w-20 h-14 flex items-center justify-center"
+            className="top-[78%] right-[12%] w-20 h-14 flex items-center justify-center"
           />
         </div>
       </main>
