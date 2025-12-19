@@ -80,7 +80,7 @@ export default function Guide() {
           <LabeledZone 
             path="/guide/face" 
             label="Face"
-            className="top-[1%] left-1/2 -translate-x-1/2 w-10 h-10"
+            className="top-[0.5%] left-1/2 -translate-x-1/2 w-10 h-10"
           />
           
           {/* Body - center torso */}
