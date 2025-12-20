@@ -227,23 +227,7 @@ export default function Report() {
                 </AvatarFallback>
               </Avatar>
               
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h1 className="font-display text-xl text-foreground">
-                    {profile?.username || 'Hunter'}
-                  </h1>
-                  <Badge className="bg-primary/20 text-primary border-primary/50 font-mono">
-                    LVL {profile?.level || 1}
-                  </Badge>
-                </div>
-                
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Zap className="w-4 h-4 text-primary" />
-                  <span className="font-mono">{profile?.current_xp || 0} XP</span>
-                </div>
-              </div>
-              
-              <div className="text-center mr-auto">
+              <div className="text-center">
                 <div className="relative">
                   <div className="w-24 h-24 rounded-full border-2 border-primary/50 flex items-center justify-center bg-primary/5">
                     <span className="font-display text-3xl text-primary">
@@ -259,6 +243,22 @@ export default function Report() {
                 <p className="font-mono text-xs text-primary mt-3 tracking-wider">
                   FACE POTENTIAL
                 </p>
+              </div>
+
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h1 className="font-display text-xl text-foreground">
+                    {profile?.username || 'Hunter'}
+                  </h1>
+                  <Badge className="bg-primary/20 text-primary border-primary/50 font-mono">
+                    LVL {profile?.level || 1}
+                  </Badge>
+                </div>
+                
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Zap className="w-4 h-4 text-primary" />
+                  <span className="font-mono">{profile?.current_xp || 0} XP</span>
+                </div>
               </div>
             </div>
           </div>
