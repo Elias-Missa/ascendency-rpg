@@ -277,6 +277,7 @@ export default function Report() {
                   <Button 
                     variant="ghost" 
                     size="sm"
+                    onClick={() => navigate(`/quest/${rec.id}`)}
                     className="flex-shrink-0 text-primary hover:bg-primary/10 group-hover:translate-x-1 transition-transform"
                   >
                     <span className="font-mono text-xs mr-1">VIEW</span>

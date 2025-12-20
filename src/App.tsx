@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
 import Report from "./pages/Report";
+import QuestDetail from "./pages/QuestDetail";
 import FaceScan from "./pages/FaceScan";
 import Tasks from "./pages/Tasks";
 import Guide from "./pages/Guide";
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/report" element={<Report />} />
+              <Route path="/quest/:id" element={<QuestDetail />} />
               <Route path="/face-scan" element={<FaceScan />} />
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/guide" element={<Guide />} />
