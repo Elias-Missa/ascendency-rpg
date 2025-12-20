@@ -240,13 +240,13 @@ export default function Report() {
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-col gap-2 mb-2">
-                      <Badge className={`${getCategoryColor(rec.category)} border font-mono text-xs w-fit`}>
-                        {rec.category}
-                      </Badge>
-                      <h3 className="font-display text-foreground leading-tight">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <h3 className="min-w-0 font-display text-foreground leading-tight whitespace-normal break-words">
                         {rec.issue}
                       </h3>
+                      <Badge className={`${getCategoryColor(rec.category)} border font-mono text-xs shrink-0`}>
+                        {rec.category}
+                      </Badge>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4 mt-4">
