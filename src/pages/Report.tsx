@@ -216,54 +216,6 @@ export default function Report() {
       <CyberBackground />
       
       <div className="relative z-10 container mx-auto px-4 py-8 max-w-4xl">
-        {/* Header */}
-        <HUDCard className="mb-8">
-          <div className="p-6">
-            <div className="flex items-center gap-6">
-              <Avatar className="h-20 w-20 border-2 border-primary/50">
-                <AvatarImage src={profile?.avatar_url || undefined} />
-                <AvatarFallback className="bg-primary/10 text-primary font-display text-2xl">
-                  {profile?.username?.charAt(0).toUpperCase() || 'H'}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div className="text-center">
-                <div className="relative">
-                  <div className="w-24 h-24 rounded-full border-2 border-primary/50 flex items-center justify-center bg-primary/5">
-                    <span className="font-display text-3xl text-primary">
-                      {profile?.face_potential_score || 72}
-                    </span>
-                  </div>
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-background px-2">
-                    <span className="font-mono text-xs text-muted-foreground tracking-wider">
-                      /100
-                    </span>
-                  </div>
-                </div>
-                <p className="font-mono text-xs text-primary mt-3 tracking-wider">
-                  FACE POTENTIAL
-                </p>
-              </div>
-
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h1 className="font-display text-xl text-foreground">
-                    {profile?.username || 'Hunter'}
-                  </h1>
-                  <Badge className="bg-primary/20 text-primary border-primary/50 font-mono">
-                    LVL {profile?.level || 1}
-                  </Badge>
-                </div>
-                
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Zap className="w-4 h-4 text-primary" />
-                  <span className="font-mono">{profile?.current_xp || 0} XP</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </HUDCard>
-
         {/* Quest List Header */}
         <div className="flex items-center gap-3 mb-6">
           <TrendingUp className="w-5 h-5 text-primary" />
