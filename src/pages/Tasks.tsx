@@ -356,6 +356,21 @@ export default function Tasks() {
               userId={user.id}
               selectedDate={selectedDate}
               onDateSelect={setSelectedDate}
+              onTaskAdded={() => {
+                // Refetch tasks for the selected date
+                const fetchTasks = async () => {
+                  const dateStr = format(selectedDate, 'yyyy-MM-dd');
+                  const { data } = await supabase
+                    .from('daily_tasks')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .eq('date_assigned', dateStr)
+                    .order('is_completed', { ascending: true })
+                    .order('created_at', { ascending: true });
+                  if (data) setTasks(data);
+                };
+                fetchTasks();
+              }}
             />
           </TabsContent>
         </Tabs>
