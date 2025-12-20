@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Loader2, ArrowLeft, Target, CheckCircle, ShoppingBag, Zap, Clock, TrendingUp } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 
 interface Recommendation {
   id: string;
@@ -116,8 +118,10 @@ export default function QuestDetail() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { toast } = useToast();
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
   const [loading, setLoading] = useState(true);
+  const [addingTask, setAddingTask] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -158,12 +162,51 @@ export default function QuestDetail() {
 
   const handleAddToTasks = async () => {
     if (!user || !recommendation) return;
+    
+    setAddingTask(true);
+    const today = format(new Date(), 'yyyy-MM-dd');
 
-    // Add as a daily task
-    await supabase.from('daily_tasks').insert({
+    // Check if task already exists for today
+    const { data: existing } = await supabase
+      .from('daily_tasks')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('task_name', recommendation.issue)
+      .eq('date_assigned', today)
+      .maybeSingle();
+
+    if (existing) {
+      toast({
+        title: 'Quest Already Added',
+        description: 'This quest is already in your daily tasks.',
+        variant: 'destructive',
+      });
+      setAddingTask(false);
+      return;
+    }
+
+    // Add as a daily task for today
+    const { error } = await supabase.from('daily_tasks').insert({
       user_id: user.id,
       task_name: recommendation.issue,
-      xp_reward: 15,
+      xp_reward: Math.max(10, (recommendation.impact_score || 5) * 2),
+      date_assigned: today,
+    });
+
+    setAddingTask(false);
+
+    if (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to add quest to tasks.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    toast({
+      title: 'Quest Added!',
+      description: `"${recommendation.issue}" added to your daily tasks.`,
     });
 
     navigate('/tasks');
@@ -329,10 +372,15 @@ export default function QuestDetail() {
         {/* Add to Tasks Button */}
         <Button
           onClick={handleAddToTasks}
+          disabled={addingTask}
           className="w-full h-14 font-display text-base tracking-wider glow-cyan"
         >
-          <Zap className="w-5 h-5 mr-2" />
-          ADD TO DAILY TASKS
+          {addingTask ? (
+            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+          ) : (
+            <Zap className="w-5 h-5 mr-2" />
+          )}
+          {addingTask ? 'ADDING...' : 'ADD TO DAILY TASKS'}
         </Button>
       </div>
     </div>
