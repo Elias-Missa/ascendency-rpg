@@ -243,7 +243,7 @@ export default function Report() {
                 </div>
               </div>
               
-              <div className="text-center">
+              <div className="text-center mr-auto">
                 <div className="relative">
                   <div className="w-24 h-24 rounded-full border-2 border-primary/50 flex items-center justify-center bg-primary/5">
                     <span className="font-display text-3xl text-primary">
