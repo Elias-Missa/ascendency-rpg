@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { CyberBackground } from '@/components/auth/CyberBackground';
 import { HUDCard } from '@/components/auth/HUDFrame';
+import { PremiumVideoPlaceholder } from '@/components/guide/PremiumVideoPlaceholder';
 import { Loader2, ArrowLeft, Eye, Smile, Sparkles, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -116,6 +117,7 @@ export default function GuideFace() {
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground whitespace-pre-line pl-13">
                   {topic.content}
+                  <PremiumVideoPlaceholder title={`${topic.title} Tutorial`} />
                 </AccordionContent>
               </AccordionItem>
             ))}
