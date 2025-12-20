@@ -8,12 +8,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @layer base {
-  html, body, #root {
+  html, body {
     height: 100%;
     width: 100%;
-    overflow: hidden; /* 🔒 Freezes the main window */
+    overflow-x: hidden;
+    overflow-y: auto;
     overscroll-behavior: none; /* 🚫 Stops "pull-to-refresh" bounce */
     touch-action: pan-x pan-y;
+  }
+
+  #root {
+    min-height: 100%;
+    width: 100%;
   }
 
   :root {
